@@ -1,0 +1,160 @@
+!SESSION 2010-08-08 15:47:47.527 -----------------------------------------------
+eclipse.buildId=I20100608-0911
+java.version=1.6.0_17
+java.vendor=Apple Inc.
+BootLoader constants: OS=macosx, ARCH=x86_64, WS=cocoa, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product -keyring /Users/pablo/.eclipse_keyring -showlocation
+Command-line arguments:  -os macosx -ws cocoa -arch x86_64 -product org.eclipse.epp.package.java.product -data /Users/pablo/Code/PhiNominal/OpenRobot/Android -product org.eclipse.epp.package.java.product -keyring /Users/pablo/.eclipse_keyring -showlocation
+
+!ENTRY org.eclipse.core.net 1 0 2010-08-08 15:47:55.993
+!MESSAGE System property http.nonProxyHosts has been set to local|*.local|169.254/16|*.169.254/16 by an external source. This value will be overwritten using the values from the preferences
+
+!ENTRY com.android.ide.eclipse.adt 4 0 2010-08-08 15:53:20.854
+!MESSAGE loadAndParseRClass: failed to find manifest package for project SimpleServer
+
+!ENTRY org.eclipse.core.resources 8 2 2010-08-08 15:53:21.967
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.core.resources".
+!STACK 1
+org.eclipse.core.runtime.CoreException: SDK is not loaded yet
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.stopBuild(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.abortOnBadSetup(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.ResourceManagerBuilder.build(Unknown Source)
+	at org.eclipse.core.internal.events.BuildManager$2.run(BuildManager.java:629)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:172)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:203)
+	at org.eclipse.core.internal.events.BuildManager$1.run(BuildManager.java:255)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:258)
+	at org.eclipse.core.internal.events.BuildManager.basicBuildLoop(BuildManager.java:311)
+	at org.eclipse.core.internal.events.BuildManager.build(BuildManager.java:343)
+	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:144)
+	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:242)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:21.968
+!MESSAGE SDK is not loaded yet
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:21.968
+!MESSAGE SDK is not loaded yet
+
+!ENTRY org.eclipse.core.resources 8 2 2010-08-08 15:53:21.977
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.core.resources".
+!STACK 1
+org.eclipse.core.runtime.CoreException: SDK is not loaded yet
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.stopBuild(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.abortOnBadSetup(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.PreCompilerBuilder.build(Unknown Source)
+	at org.eclipse.core.internal.events.BuildManager$2.run(BuildManager.java:629)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:172)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:203)
+	at org.eclipse.core.internal.events.BuildManager$1.run(BuildManager.java:255)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:258)
+	at org.eclipse.core.internal.events.BuildManager.basicBuildLoop(BuildManager.java:311)
+	at org.eclipse.core.internal.events.BuildManager.build(BuildManager.java:343)
+	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:144)
+	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:242)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:21.977
+!MESSAGE SDK is not loaded yet
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:21.977
+!MESSAGE SDK is not loaded yet
+
+!ENTRY org.eclipse.core.resources 8 2 2010-08-08 15:53:54.044
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.core.resources".
+!STACK 1
+org.eclipse.core.runtime.CoreException: Project target not loaded yet.
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.stopBuild(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.abortOnBadSetup(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.ResourceManagerBuilder.build(Unknown Source)
+	at org.eclipse.core.internal.events.BuildManager$2.run(BuildManager.java:629)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:172)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:203)
+	at org.eclipse.core.internal.events.BuildManager$1.run(BuildManager.java:255)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:258)
+	at org.eclipse.core.internal.events.BuildManager.basicBuildLoop(BuildManager.java:311)
+	at org.eclipse.core.internal.events.BuildManager.build(BuildManager.java:343)
+	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:144)
+	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:242)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:54.047
+!MESSAGE Project target not loaded yet.
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:54.047
+!MESSAGE Project target not loaded yet.
+
+!ENTRY org.eclipse.core.resources 8 2 2010-08-08 15:53:54.049
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.core.resources".
+!STACK 1
+org.eclipse.core.runtime.CoreException: Project target not loaded yet.
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.stopBuild(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.abortOnBadSetup(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.PreCompilerBuilder.build(Unknown Source)
+	at org.eclipse.core.internal.events.BuildManager$2.run(BuildManager.java:629)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:172)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:203)
+	at org.eclipse.core.internal.events.BuildManager$1.run(BuildManager.java:255)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:258)
+	at org.eclipse.core.internal.events.BuildManager.basicBuildLoop(BuildManager.java:311)
+	at org.eclipse.core.internal.events.BuildManager.build(BuildManager.java:343)
+	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:144)
+	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:242)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:54.049
+!MESSAGE Project target not loaded yet.
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:54.049
+!MESSAGE Project target not loaded yet.
+
+!ENTRY org.eclipse.core.resources 8 2 2010-08-08 15:53:55.059
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.core.resources".
+!STACK 1
+org.eclipse.core.runtime.CoreException: Project target not loaded yet.
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.stopBuild(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.abortOnBadSetup(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.ResourceManagerBuilder.build(Unknown Source)
+	at org.eclipse.core.internal.events.BuildManager$2.run(BuildManager.java:629)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:172)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:203)
+	at org.eclipse.core.internal.events.BuildManager$1.run(BuildManager.java:255)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:258)
+	at org.eclipse.core.internal.events.BuildManager.basicBuildLoop(BuildManager.java:311)
+	at org.eclipse.core.internal.events.BuildManager.build(BuildManager.java:343)
+	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:144)
+	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:242)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:55.059
+!MESSAGE Project target not loaded yet.
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:55.059
+!MESSAGE Project target not loaded yet.
+
+!ENTRY org.eclipse.core.resources 8 2 2010-08-08 15:53:55.061
+!MESSAGE Problems occurred when invoking code from plug-in: "org.eclipse.core.resources".
+!STACK 1
+org.eclipse.core.runtime.CoreException: Project target not loaded yet.
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.stopBuild(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.BaseBuilder.abortOnBadSetup(Unknown Source)
+	at com.android.ide.eclipse.adt.internal.build.PreCompilerBuilder.build(Unknown Source)
+	at org.eclipse.core.internal.events.BuildManager$2.run(BuildManager.java:629)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:172)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:203)
+	at org.eclipse.core.internal.events.BuildManager$1.run(BuildManager.java:255)
+	at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:42)
+	at org.eclipse.core.internal.events.BuildManager.basicBuild(BuildManager.java:258)
+	at org.eclipse.core.internal.events.BuildManager.basicBuildLoop(BuildManager.java:311)
+	at org.eclipse.core.internal.events.BuildManager.build(BuildManager.java:343)
+	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:144)
+	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:242)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:55.061
+!MESSAGE Project target not loaded yet.
+!SUBENTRY 1 com.android.ide.eclipse.adt 8 0 2010-08-08 15:53:55.061
+!MESSAGE Project target not loaded yet.
+
+!ENTRY org.eclipse.ui 4 4 2010-08-08 19:20:20.721
+!MESSAGE Referenced part does not exist yet: org.eclipse.ui.views.ProblemView.

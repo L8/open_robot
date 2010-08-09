@@ -72,36 +72,20 @@ public class ServerActivity extends Activity {
                         });
 
                         try {
+
                             BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                            OutputStream sock_out= client.getOutputStream();
+                            OutputStream bout= new BufferedOutputStream(sock_out);
+                            out = new OutputStreamWriter(bout, "8859_1");
+                            
                             String line = null;
                             while ((line = in.readLine()) != null) {
-                                Log.d("ServerActivity", line);
-                                
-                                
-                                try {        
-                                    OutputStream sock_out= client.getOutputStream();
-                                    OutputStream bout= new BufferedOutputStream(sock_out);
-                              
-                                    out = new OutputStreamWriter(bout, "8859_1");
-                                    
-                                  
-                                    out.write("Return message");
-                                    
-                                    out.flush();  // Don't forget to flush!
-                                    out.close();
-                                  }
-                                  catch (UnsupportedEncodingException e) {
-                                    System.out.println(
-                                     "This VM does not support the Latin-1 character set."
-                                    );
-                                  }
-                                  catch (IOException e) {
-                                    System.out.println(e.getMessage());        
-                                  }
-                                  
-                                
-                
-                                  handler.post(new Runnable() {
+                                Log.d("ServerResponse:  ", line);
+
+                                out.write(handleInputCommand(line));
+                                out.flush();  // Don't forget to flush!
+                               
+                                handler.post(new Runnable() {
                                     
                                     public void run() {
                                         // do whatever you want to the front end
@@ -110,6 +94,8 @@ public class ServerActivity extends Activity {
                                 });
                             }
                             break;
+                        } catch (UnsupportedEncodingException e) {
+                        	Log.d("StreamError:  ", "This VM does not support the Latin-1 character set.");
                         } catch (Exception e) {
                             handler.post(new Runnable() {
                                 
@@ -140,7 +126,7 @@ public class ServerActivity extends Activity {
         }
     }
 
-    // gets the ip address of your phone's network
+    // gets the ip address of the phone's network
     private String getLocalIpAddress() {
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
@@ -157,6 +143,14 @@ public class ServerActivity extends Activity {
         }
         return null;
     }
+    
+    private String handleInputCommand(String input) {
+    	
+    	
+    	
+    	
+    	return input;
+    }
 
     @Override
     protected void onStop() {
@@ -164,6 +158,8 @@ public class ServerActivity extends Activity {
         try {
              // make sure you close the socket upon exiting
              serverSocket.close();
+             out.flush();
+             out.close();
          } catch (IOException e) {
              e.printStackTrace();
          }
