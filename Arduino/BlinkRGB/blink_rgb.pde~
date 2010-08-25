@@ -1,0 +1,50 @@
+// OUTPUT pins
+int redPin = 13;
+int greenPin = 12;
+int bluePin = 11;
+
+// INPUT pins
+int switchPin = 2;
+
+// Variables
+int switchValue;
+int val;
+int buttonState;
+
+
+void setup()   {                
+  // initialize the digital pin as an output:
+  pinMode(redPin, OUTPUT);     
+  pinMode(greenPin, OUTPUT);     
+  pinMode(bluePin, OUTPUT);     
+  pinMode(switchPin, INPUT);
+
+  // setup serial connection at 9600 bps
+  Serial.begin(9600);
+  buttonState = digitalRead(switchPin);
+
+}
+
+// the loop() method runs over and over again,
+// as long as the Arduino has power
+
+void loop()                     
+{
+  val = digitalRead(switchPin);
+  Serial.println(val);
+
+
+  if (val != buttonState) {
+     if (val == HIGH) {
+     	 digitalWrite(redPin, HIGH);
+	 digitalWrite(greenPin, HIGH);
+	 digitalWrite(bluePin, HIGH);
+     } else {
+  
+	 digitalWrite(redPin, LOW);
+  	 digitalWrite(greenPin, LOW);
+	 digitalWrite(bluePin, LOW);
+     }
+     buttonState = val;
+  }
+}
