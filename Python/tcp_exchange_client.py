@@ -1,7 +1,8 @@
 # TCP client                                                                                                                                                                                      
 import socket
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(("192.168.0.177", 8080))
+ip_addr = raw_input("Enter IP: -->  ")
+client_socket.connect((ip_addr, 8080))
 while (1):
     msg = raw_input ("Message Please: -->  ")
     if (msg == "q"):
