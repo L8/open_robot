@@ -2,6 +2,7 @@ package com.robot.open;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -16,7 +17,7 @@ import at.abraxas.amarino.AmarinoIntent;
  
 public class TouchControl extends Activity {
 	
-	private static final String DEVICE_ADDRESS = "00:07:80:91:30:2D";
+	private static final String DEVICE_ADDRESS = "00:07:80:91:32:51";
 	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
 	private static final char ARDUINO_SHOULD_KILL_FUNCTION_FLAG = 'd';
 	
@@ -82,6 +83,7 @@ public class TouchControl extends Activity {
         lastChange = System.currentTimeMillis();
         
         main = (FrameLayout) findViewById(R.id.main_view);
+        main.setBackgroundColor(Color.CYAN);
         xPosTextView = (TextView)findViewById(R.id.x_position_textview);
         yPosTextView = (TextView)findViewById(R.id.y_position_textview);
         
@@ -102,7 +104,7 @@ public class TouchControl extends Activity {
             		shouldEnable = true;
             		shouldKill = false;
             		killEnabled = false;
-            		killButton.setText("Kill damnit!");
+            		killButton.setText("Stop please");
             	} else {
             		shouldEnable = false;
             		shouldKill = true;
@@ -145,8 +147,8 @@ public class TouchControl extends Activity {
                         thumbBall.invalidate();
                        
                         messageArduinoIfAppropriate(thumbBall.x, translatedY(-thumbBall.y));
-                        xPosTextView.setText(Float.toString(translatedX(x)));
-                    	yPosTextView.setText(Float.toString(-translatedY(y)));
+                        xPosTextView.setText(Integer.toString((int)translatedX(x)));
+                    	yPosTextView.setText(Integer.toString((int)translatedY(y)));
                 	}
                    break;
                 }
@@ -191,16 +193,6 @@ public class TouchControl extends Activity {
 			sendIntArrayToArduino(values, ARDUINO_CONTROL_INPUT_FUNCTION_FLAG);
 		}
     }
-    
-    private void messageArduinoManually(int message) {
-    	lastChange = System.currentTimeMillis();
-		Intent intent = new Intent(AmarinoIntent.ACTION_SEND);
-        intent.putExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS, DEVICE_ADDRESS);
-        intent.putExtra(AmarinoIntent.EXTRA_DATA_TYPE, AmarinoIntent.INT_EXTRA);
-        intent.putExtra(AmarinoIntent.EXTRA_FLAG, 'c');
-        intent.putExtra(AmarinoIntent.EXTRA_DATA, message);
-        this.sendBroadcast(intent);
-	}
     
     private void sendIntToArduino(int message, char methodFlag) {
     	lastChange = System.currentTimeMillis();

@@ -1,6 +1,6 @@
 package com.robot.open;
 
-import android.R.color;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,7 +18,7 @@ public class ThumbBall extends View{
 	 
 	 public ThumbBall(Context context, float x, float y, int r) {
 	        super(context);
-	        mPaint.setColor(0xFFFF0000);
+	        mPaint.setColor(0xFF000000);
 	        linePaint.setColor(Color.BLACK);
 	        this.x = x;
 	        this.y = y;

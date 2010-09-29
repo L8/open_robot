@@ -31,14 +31,14 @@
         
     <FrameLayout android:id="@+id/main_view"
   		xmlns:android="http://schemas.android.com/apk/res/android"
-  		android:background="#FF66AA33" 
+  		android:background="#6B8E23" 
   		android:gravity="center_vertical"
   		android:layout_width="250px"
   		android:layout_height="250px"/>
   		
   	<FrameLayout android:id="@+id/spacer_view"
   		xmlns:android="http://schemas.android.com/apk/res/android"
-  		android:background="#FF66AA33" 
+  		android:background="#FF000000" 
   		android:gravity="center_vertical"
   		android:layout_width="80px"
   		android:layout_height="80px"
@@ -48,7 +48,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
-    android:text="Kill damnit!" />
+    android:text="Stop please" />
         
 </LinearLayout>
 
