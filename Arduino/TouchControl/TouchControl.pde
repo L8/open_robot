@@ -2,7 +2,6 @@
 #include <Servo.h>      // include the servo library
 
 #define SERVO_OFF 90
-#define DRIVE_OFF 0
 
 Servo servoMotor;         // creates an instance of the servo object to control a servo
 Servo driveMotor;
@@ -16,6 +15,8 @@ const int servoPin = 2;
 
 int servoValue = SERVO_OFF;
 int motorValue = SERVO_OFF;
+
+int killEnabled = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -33,6 +34,7 @@ void setup() {
   driveMotor.write(SERVO_OFF);
 
   meetAndroid.registerFunction(acceptControlInput, 'c');
+  meetAndroid.registerFunction(killEverything, 'd');
 }
 
 void loop(){
@@ -40,14 +42,13 @@ void loop(){
   meetAndroid.receive(); 
   
   
-  // read the analog in value:
-  //potValue = analogRead(potPin);            
-  
-  // change the analog out value:
-  //analogWrite(motorEnablePin, outputValue);
-  servoMotor.write(servoValue);
-  driveMotor.write(motorValue);
-
+  if (killEnabled == 1) {
+      servoMotor.write(SERVO_OFF);
+      driveMotor.write(SERVO_OFF);
+  } else {
+    servoMotor.write(servoValue);
+    driveMotor.write(motorValue);
+  }
   
   delay(15);
 }
@@ -72,5 +73,16 @@ void acceptControlInput(byte flag, byte numOfValues)
   Serial.print("\t processed =\t");
   Serial.println(motorValue);  
 */
+}
+
+void killEverything(byte flag, byte numOfValues)
+{
+ 
+  int value = meetAndroid.getInt();
+  if (value == 1) {
+      killEnabled = 1;
+  } else {
+    killEnabled = 0;
+  }
 }
 

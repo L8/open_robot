@@ -16,7 +16,9 @@ public final class R {
         public static final int red_x=0x7f020002;
     }
     public static final class id {
+        public static final int kill_button=0x7f050004;
         public static final int main_view=0x7f050002;
+        public static final int spacer_view=0x7f050003;
         public static final int x_position_textview=0x7f050000;
         public static final int y_position_textview=0x7f050001;
     }

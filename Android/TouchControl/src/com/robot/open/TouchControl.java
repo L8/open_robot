@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import at.abraxas.amarino.Amarino;
@@ -16,7 +18,7 @@ public class TouchControl extends Activity {
 	
 	private static final String DEVICE_ADDRESS = "00:07:80:91:30:2D";
 	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
-	private static final char ARDUINO_Y_POLARITY_FUNCTION_FLAG = 'd';
+	private static final char ARDUINO_SHOULD_KILL_FUNCTION_FLAG = 'd';
 	
 	public final static int DELAY = 150;
 	public final static int FRAME_WIDTH = 250;
@@ -27,11 +29,16 @@ public class TouchControl extends Activity {
 	private TextView xPosTextView;
 	private TextView yPosTextView;
 	private FrameLayout main;
+	private Button killButton;
 	
 	private int boxCenterX;
 	private int boxCenterY;
 	
 	private boolean isTouching = false;
+	private boolean shouldKill = false;
+	private boolean shouldEnable = false;
+	private boolean killEnabled = false;
+	
 	
 	
 	private long lastChange;
@@ -86,6 +93,26 @@ public class TouchControl extends Activity {
         
         boxCenterX = FRAME_WIDTH / 2;
         boxCenterY = FRAME_HEIGHT / 2;
+        
+        this.killButton = (Button)this.findViewById(R.id.kill_button);
+        this.killButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	if (killEnabled) {
+            		shouldEnable = true;
+            		shouldKill = false;
+            		killEnabled = false;
+            		killButton.setText("Kill damnit!");
+            	} else {
+            		shouldEnable = false;
+            		shouldKill = true;
+            		killEnabled = true;
+            		killButton.setText("OK, Game On.");
+            	}
+            	
+            }
+            
+          });
         
         main.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent e) {
@@ -146,14 +173,22 @@ public class TouchControl extends Activity {
 	}
     
     private void messageArduinoIfAppropriate(float x, float y) {
-    	
+    	if (shouldKill || shouldEnable) {
+    		// Send unconditional kill or resume message
+			sendIntToArduino(shouldKill ? 1 : 0, ARDUINO_SHOULD_KILL_FUNCTION_FLAG);
+			shouldKill = false;
+			shouldEnable = false;
+			thumbBall.x = boxCenterX;
+			thumbBall.y = boxCenterY;
+			return;
+		}
     	if (System.currentTimeMillis() - lastChange > DELAY ) {
-    			
-    			int[] values = new int[2];
-    			values[0] = (int)thumbBall.x;   //(int)x; // (int) thumbBall.x;
-    			values[1] = (int)thumbBall.y;   //(int)y; // (int) translatedY(thumbBall.y);
-    			
-    			sendIntArrayToArduino(values, ARDUINO_CONTROL_INPUT_FUNCTION_FLAG);
+		 
+			int[] values = new int[2];
+			values[0] = (int)thumbBall.x;   
+			values[1] = (int)thumbBall.y;
+			
+			sendIntArrayToArduino(values, ARDUINO_CONTROL_INPUT_FUNCTION_FLAG);
 		}
     }
     
