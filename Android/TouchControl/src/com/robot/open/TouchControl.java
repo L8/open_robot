@@ -14,7 +14,7 @@ import at.abraxas.amarino.AmarinoIntent;
  
 public class TouchControl extends Activity {
 	
-	private static final String DEVICE_ADDRESS = "00:07:80:91:32:51";
+	private static final String DEVICE_ADDRESS = "00:07:80:91:30:2D";
 	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
 	private static final char ARDUINO_Y_POLARITY_FUNCTION_FLAG = 'd';
 	
@@ -28,15 +28,11 @@ public class TouchControl extends Activity {
 	private TextView yPosTextView;
 	private FrameLayout main;
 	
-	private boolean xPolarityPos = true;
-	private boolean yPolarityPos = true;
-	
 	private int boxCenterX;
 	private int boxCenterY;
 	
 	private boolean isTouching = false;
-	private boolean yPolarityChangeMessageNeeded = false;
-	private boolean xPolarityChangeMessageNeeded = false;
+	
 	
 	private long lastChange;
 	
@@ -74,7 +70,7 @@ public class TouchControl extends Activity {
         setContentView(R.layout.main);
         
         // Establish bluetooth connection with Arduino
-        //Amarino.connect(this, DEVICE_ADDRESS);
+        Amarino.connect(this, DEVICE_ADDRESS);
         
         lastChange = System.currentTimeMillis();
         
@@ -120,8 +116,8 @@ public class TouchControl extends Activity {
                 		thumbBall.x = x;
                         thumbBall.y = y;
                         thumbBall.invalidate();
-                        combineFloatsIntoInt(thumbBall.x, translatedY(thumbBall.y));
-                        //messageArduinoIfAppropriate(thumbBall.x, translatedY(thumbBall.y));
+                       
+                        messageArduinoIfAppropriate(thumbBall.x, translatedY(-thumbBall.y));
                         xPosTextView.setText(Float.toString(translatedX(x)));
                     	yPosTextView.setText(Float.toString(-translatedY(y)));
                 	}
@@ -151,25 +147,13 @@ public class TouchControl extends Activity {
     
     private void messageArduinoIfAppropriate(float x, float y) {
     	
-    	if ((xPolarityPos && x < 0) || (!xPolarityPos && x > 0)) {
-    		// message arduino about x polarity change
-    	}
-    	if ((yPolarityPos && y < 0) || (!yPolarityPos && y > 0)) {
-    		// message arduino about y polarity change next time delay condition is met
-    		yPolarityChangeMessageNeeded = true;
-    		yPolarityPos = !yPolarityPos;
-    	}
-    	
     	if (System.currentTimeMillis() - lastChange > DELAY ) {
-    		if (yPolarityChangeMessageNeeded) {
-    			sendIntToArduino((int)y, ARDUINO_Y_POLARITY_FUNCTION_FLAG);
-    			yPolarityChangeMessageNeeded = false;
-    		} else if (xPolarityChangeMessageNeeded) {
     			
-    		} else {
-    			//int combinedInt = combineFloatsIntoInt(x, Math.abs(y));
-        		sendIntToArduino(Math.abs((int) y), ARDUINO_CONTROL_INPUT_FUNCTION_FLAG);
-    		}
+    			int[] values = new int[2];
+    			values[0] = (int)thumbBall.x;   //(int)x; // (int) thumbBall.x;
+    			values[1] = (int)thumbBall.y;   //(int)y; // (int) translatedY(thumbBall.y);
+    			
+    			sendIntArrayToArduino(values, ARDUINO_CONTROL_INPUT_FUNCTION_FLAG);
 		}
     }
     
@@ -188,6 +172,16 @@ public class TouchControl extends Activity {
     	Intent intent = new Intent(AmarinoIntent.ACTION_SEND);
         intent.putExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS, DEVICE_ADDRESS);
         intent.putExtra(AmarinoIntent.EXTRA_DATA_TYPE, AmarinoIntent.INT_EXTRA);
+        intent.putExtra(AmarinoIntent.EXTRA_FLAG, methodFlag);
+        intent.putExtra(AmarinoIntent.EXTRA_DATA, message);
+        this.sendBroadcast(intent);
+    }
+    
+    private void sendIntArrayToArduino(int[] message, char methodFlag) {
+    	lastChange = System.currentTimeMillis();
+    	Intent intent = new Intent(AmarinoIntent.ACTION_SEND);
+        intent.putExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS, DEVICE_ADDRESS);
+        intent.putExtra(AmarinoIntent.EXTRA_DATA_TYPE, AmarinoIntent.INT_ARRAY_EXTRA);
         intent.putExtra(AmarinoIntent.EXTRA_FLAG, methodFlag);
         intent.putExtra(AmarinoIntent.EXTRA_DATA, message);
         this.sendBroadcast(intent);
