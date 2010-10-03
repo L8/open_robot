@@ -145,10 +145,6 @@ public class ServerActivity extends Activity {
     }
     
     private String handleInputCommand(String input) {
-    	
-    	
-    	
-    	
     	return input;
     }
 

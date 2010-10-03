@@ -1,0 +1,144 @@
+package com.robot.open;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
+
+public class ServerService extends Service {
+	
+	public static final int SERVER_SERVICE_STATUS_LISTENING = 1;
+	public static final int SERVER_SERVICE_STATUS_CONNECTED = 2;
+	public static final int SERVER_SERVICE_STATUS_CHARACTER_EXCEPTION = 3;
+	public static final int SERVER_SERVICE_STATUS_CONNECTION_INTERRUPTED = 4;
+	public static final int SERVER_SERVICE_STATUS_CONNECTION_NOT_DETECTED = 5;
+	public static final int SERVER_SERVICE_STATUS_GENERIC_ERROR = 6;
+	
+    public static String SERVERIP = "10.0.2.15";   	// default ip...
+    public static final int SERVERPORT = 8080;		// default a port
+
+    private static final String TAG = "ServerService";
+    private Handler handler = new Handler();
+    private ServerSocket serverSocket;
+    private OutputStreamWriter out;
+
+	
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
+	
+	@Override
+	public void onCreate() {
+		Toast.makeText(this, "Server Service Created", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "onCreate");
+		
+	}
+
+	@Override
+	public void onDestroy() {
+		Toast.makeText(this, "Server Service Stopped", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "onDestroy"); 
+		
+		 try {
+             // make sure you close the socket upon exiting
+             serverSocket.close();
+             out.flush();
+             out.close();
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+	}
+	
+	@Override
+	public void onStart(Intent intent, int startid) {
+		Toast.makeText(this, "Server Service Started", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "onStart");
+		
+		   SERVERIP = NetworkHelper.getLocalIpAddress();
+
+	       Thread fst = new Thread(new ServerThread());
+	       fst.start();
+	}
+	
+    private String handleInputCommand(String input) {
+    	return input;
+    }
+    
+    private void postStatus(String statusMessage, int status) {
+    	handler.post(new Runnable() {          
+            public void run() {
+            	
+            }
+    	});
+    }
+    
+    public class ServerThread implements Runnable {
+
+        public void run() {
+            try {
+                if (SERVERIP != null) {
+                	
+                	postStatus("Listening on IP: " + SERVERIP, SERVER_SERVICE_STATUS_LISTENING);
+                    Log.d(TAG, "Got IP, now listening...");
+                    
+                    serverSocket = new ServerSocket(SERVERPORT);
+                    while (true) {
+                        // listen for incoming clients
+                        Socket client = serverSocket.accept();
+                        
+                        postStatus("Connected.", SERVER_SERVICE_STATUS_CONNECTED);
+                        
+                        try {
+
+                            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                            OutputStream sock_out= client.getOutputStream();
+                            OutputStream bout= new BufferedOutputStream(sock_out);
+                            out = new OutputStreamWriter(bout, "8859_1");
+                            
+                            String line = null;
+                            while ((line = in.readLine()) != null) {
+                                Log.d("ServerResponse:  ", line);
+
+                                out.write(handleInputCommand(line));
+                                out.flush();  // Don't forget to flush!
+                               
+                                handler.post(new Runnable() {
+                                    
+                                    public void run() {
+                                        // do whatever you want to the front end
+                                        // this is where you can be creative
+                                    }
+                                });
+                            }
+                            break;
+                        } catch (UnsupportedEncodingException e) {
+                        	postStatus("This VM does not support the Latin-1 character set.", SERVER_SERVICE_STATUS_CHARACTER_EXCEPTION);
+                        	Log.d("StreamError:  ", "This VM does not support the Latin-1 character set.");
+                        } catch (Exception e) {
+                        	postStatus("Oops. Connection interrupted. Please reconnect.", SERVER_SERVICE_STATUS_CONNECTION_INTERRUPTED);
+                            e.printStackTrace();
+                        }
+                    }
+                } else {      
+                    postStatus("Couldn't detect internet connection.", SERVER_SERVICE_STATUS_CONNECTION_NOT_DETECTED);                        
+                }
+            } catch (Exception e) {
+            	postStatus("Error", SERVER_SERVICE_STATUS_GENERIC_ERROR);
+                e.printStackTrace();
+            }
+        }
+    }
+}
