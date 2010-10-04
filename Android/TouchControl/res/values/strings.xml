@@ -2,4 +2,12 @@
 <resources>
     <string name="hello">Hello World, TouchControl!</string>
     <string name="app_name">TouchControl</string>
+    <string name="start_server">Start Server</string>
+    <string name="start_client">Start Client</string>
+    <string name="stop_server">Stop Server</string>
+    <string name="stop_client">Stop Client</string>
+    <string name="client_service_connected">ClientServiceConnected</string>
+    <string name="server_service_connected">ServerServiceConnected</string>
+    <string name="client_service_disconnected">ClientServiceDisconnected</string>
+    <string name="server_service_disconnected">ServerServiceDisconnected</string>
 </resources>

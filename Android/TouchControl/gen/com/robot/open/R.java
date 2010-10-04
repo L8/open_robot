@@ -16,17 +16,34 @@ public final class R {
         public static final int red_x=0x7f020002;
     }
     public static final class id {
-        public static final int kill_button=0x7f050004;
-        public static final int main_view=0x7f050002;
-        public static final int spacer_view=0x7f050003;
-        public static final int x_position_textview=0x7f050000;
-        public static final int y_position_textview=0x7f050001;
+        public static final int client_connection_button=0x7f060004;
+        public static final int kill_button=0x7f060006;
+        public static final int main_view=0x7f060002;
+        public static final int server_connection_button=0x7f060005;
+        public static final int spacer_view=0x7f060003;
+        public static final int start_client=0x7f060009;
+        public static final int start_server=0x7f060007;
+        public static final int stop_client=0x7f06000a;
+        public static final int stop_server=0x7f060008;
+        public static final int x_position_textview=0x7f060000;
+        public static final int y_position_textview=0x7f060001;
     }
     public static final class layout {
         public static final int main=0x7f030000;
     }
+    public static final class menu {
+        public static final int options_menu=0x7f050000;
+    }
     public static final class string {
         public static final int app_name=0x7f040001;
+        public static final int client_service_connected=0x7f040006;
+        public static final int client_service_disconnected=0x7f040008;
         public static final int hello=0x7f040000;
+        public static final int server_service_connected=0x7f040007;
+        public static final int server_service_disconnected=0x7f040009;
+        public static final int start_client=0x7f040003;
+        public static final int start_server=0x7f040002;
+        public static final int stop_client=0x7f040005;
+        public static final int stop_server=0x7f040004;
     }
 }

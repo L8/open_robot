@@ -1,0 +1,134 @@
+package com.robot.open;
+
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.Handler;
+import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
+
+public class ClientService extends Service {
+
+	
+	private static final String TAG = "ClientService";
+    private String serverIpAddress = "192.168.0.164";
+    private boolean connected = false;
+    private Handler handler = new Handler();
+    private int serverPort = 8080; // default port
+    private PrintWriter out;
+    private boolean shouldTransmit = true;
+   
+    /**
+     * Class for clients to access.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with
+     * IPC.
+     */
+    public class ClientBinder extends Binder {
+        ClientService getService() {
+            return ClientService.this;
+        }
+    }
+    
+ // This is the object that receives interactions from clients. 
+    private final IBinder mBinder = new ClientBinder();
+    
+	@Override
+	public IBinder onBind(Intent intent) {
+		
+		Toast.makeText(this, "Client Service Bound", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "onBind");
+
+		return mBinder;
+	}
+	
+	@Override
+	public void onCreate() {
+		Toast.makeText(this, "Client Service Created", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "onCreate");
+    }
+	
+	@Override
+	public void onStart(Intent intent, int startid) {
+		Toast.makeText(this, "Client Service Started", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "onStart");		
+	}
+	
+	public void makeConnection() {
+		Toast.makeText(this, "Making Connection", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "makeConnection");
+		
+		if (!serverIpAddress.equals("")) {
+            Thread cThread = new Thread(new ClientThread());
+            cThread.start();
+        }
+	}
+
+	private String getInputForServer() {
+		return "ClientMessage:  " + System.currentTimeMillis();
+	}
+
+    public class ClientThread implements Runnable {
+
+        public void run() {
+            try {
+                InetAddress serverAddr = InetAddress.getByName(serverIpAddress);
+                Log.d(TAG, "C: Connecting...");
+                Socket socket = new Socket(serverAddr, serverPort);
+                connected = true;
+                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                while (connected) {
+                	if (shouldTransmit) {
+                        try {
+                            Log.d(TAG, "C: Sending command.");
+                                
+                            // send message to Server
+                            out.println(getInputForServer());
+                            
+                            Log.d(TAG, "C: Sent.");
+                        } catch (Exception e) {
+                            Log.d(TAG, "S: Error", e);
+                            // connected = false;
+                        }
+                	}
+                }
+                socket.close();
+                Log.d(TAG, "C: Closed.");
+            } catch (Exception e) {
+                Log.e(TAG, "C: Error", e);
+                connected = false;
+            }
+        }
+    }
+    
+    public boolean getShouldTransmit() {
+    	return this.shouldTransmit;
+    }
+    
+    public void setShouldTransmit(boolean shouldTransmit) {
+    	this.shouldTransmit = shouldTransmit;
+    }
+
+	public String getServerIpAddress() {
+		return serverIpAddress;
+	}
+
+	public void setServerIpAddress(String serverIpAddress) {
+		this.serverIpAddress = serverIpAddress;
+	}
+
+	public int getServerPort() {
+		return serverPort;
+	}
+
+	public void setServerPort(int serverPort) {
+		this.serverPort = serverPort;
+	}
+
+}

@@ -12,6 +12,7 @@ import java.net.Socket;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -34,16 +35,37 @@ public class ServerService extends Service {
     private ServerSocket serverSocket;
     private OutputStreamWriter out;
 
+    private ServerServiceInterface delegate;
 	
+	 /**
+     * Class for clients to access.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with
+     * IPC.
+     */
+    public class ServerBinder extends Binder {
+        ServerService getService() {
+            return ServerService.this;
+        }
+    }
+    
+ // This is the object that receives interactions from clients. 
+    private final IBinder mBinder = new ServerBinder();
+    
 	@Override
 	public IBinder onBind(Intent intent) {
-		return null;
+		
+		Toast.makeText(this, "Server Service Bound", Toast.LENGTH_LONG).show();
+		Log.d(TAG, "onBind");
+
+		return mBinder;
 	}
 	
 	@Override
 	public void onCreate() {
 		Toast.makeText(this, "Server Service Created", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onCreate");
+
+		SERVERIP = NetworkHelper.getLocalIpAddress();
 		
 	}
 
@@ -66,26 +88,39 @@ public class ServerService extends Service {
 	public void onStart(Intent intent, int startid) {
 		Toast.makeText(this, "Server Service Started", Toast.LENGTH_LONG).show();
 		Log.d(TAG, "onStart");
-		
-		   SERVERIP = NetworkHelper.getLocalIpAddress();
+	}
+	
+	public void makeConnection() {
 
-	       Thread fst = new Thread(new ServerThread());
-	       fst.start();
+       Thread fst = new Thread(new ServerThread());
+       fst.start();
 	}
 	
     private String handleInputCommand(String input) {
     	return input;
     }
     
-    private void postStatus(String statusMessage, int status) {
+    private void postStatus(final String statusMessage, final int status) {
     	handler.post(new Runnable() {          
             public void run() {
-            	
+            	if (delegate != null) {
+            		delegate.serverServiceStatusChange(statusMessage, status);
+            	}
             }
     	});
     }
     
-    public class ServerThread implements Runnable {
+    public ServerServiceInterface getDelegate() {
+		return delegate;
+	}
+
+	public void setDelegate(ServerServiceInterface delegate) {
+		this.delegate = delegate;
+	}
+
+
+
+	public class ServerThread implements Runnable {
 
         public void run() {
             try {
@@ -141,4 +176,9 @@ public class ServerService extends Service {
             }
         }
     }
+}
+
+interface ServerServiceInterface {
+	
+	public void serverServiceStatusChange(String message, int status);
 }
