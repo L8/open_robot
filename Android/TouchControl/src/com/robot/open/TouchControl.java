@@ -21,7 +21,8 @@ import android.widget.Toast;
 import at.abraxas.amarino.Amarino;
 import at.abraxas.amarino.AmarinoIntent;
  
-public class TouchControl extends Activity implements ThumbBallListener, ServerServiceInterface {
+public class TouchControl extends Activity implements ThumbBallListener, ServerServiceInterface, 
+						ClientServiceInterface {
 	
 	private static final String DEVICE_ADDRESS = "00:07:80:91:32:51";
 	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
@@ -158,7 +159,7 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
         ((Button)this.findViewById(R.id.client_connection_button)).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-            	clientService.makeConnection();
+            	makeClientConnection();
             }
         });
     }
@@ -166,6 +167,11 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     void makeServerConnection() {
     	serverService.setDelegate(this);
     	serverService.makeConnection();
+    }
+    
+    void makeClientConnection() {
+    	clientService.setDelegate(this);
+    	clientService.makeConnection();
     }
     
     @Override
@@ -279,6 +285,33 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
 	public void serverServiceStatusChange(String message, int status) {
     	Log.d("OUTPUT", message);
     }
+    
+    @Override
+	public void serverServiceReceivedMessage(ServerService service, String message) {
+    	//Log.d("OUTPUT", "Message:  " + message);
+    	String[] splitArray = message.split(ServerService.SERVER_DELIMITER);
+    	if (splitArray.length >= 2) {
+    		
+    		float x = Float.parseFloat(((String)splitArray[0]));
+    		float y = Float.parseFloat(((String)splitArray[1]));
+    		Log.d("OUTPUT", splitArray[0] + ",  " + x + "        " + splitArray[1] + ",  " + y);
+    		thumbBall.setX(x);
+    		thumbBall.setY(y);
+    		thumbBall.invalidate();
+    	}
+    }
+    
+    
+    // ClientServiceInterface
+	public void clientServiceStatusChange(String message, int status) {
+		Log.d("OUTPUT", message);
+	}
+	
+	public String messageToSend() {
+		Float xFloat = new Float(thumbBall.getX());
+		Float yFloat = new Float(thumbBall.getY());
+		return xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
+	}
  
     private void messageArduinoIfAppropriate(int x, int y) {
     	if (shouldKill || shouldEnable) {

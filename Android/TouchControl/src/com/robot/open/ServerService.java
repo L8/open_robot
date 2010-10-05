@@ -27,6 +27,8 @@ public class ServerService extends Service {
 	public static final int SERVER_SERVICE_STATUS_CONNECTION_NOT_DETECTED = 5;
 	public static final int SERVER_SERVICE_STATUS_GENERIC_ERROR = 6;
 	
+	public static final String SERVER_DELIMITER = "  ";
+	
     public static String SERVERIP = "10.0.2.15";   	// default ip...
     public static final int SERVERPORT = 8080;		// default a port
 
@@ -62,7 +64,7 @@ public class ServerService extends Service {
 	
 	@Override
 	public void onCreate() {
-		Toast.makeText(this, "Server Service Created", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Server Service Created", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onCreate");
 
 		SERVERIP = NetworkHelper.getLocalIpAddress();
@@ -71,7 +73,7 @@ public class ServerService extends Service {
 
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "Server Service Stopped", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Server Service Stopped", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onDestroy"); 
 		
 		 try {
@@ -86,8 +88,12 @@ public class ServerService extends Service {
 	
 	@Override
 	public void onStart(Intent intent, int startid) {
-		Toast.makeText(this, "Server Service Started", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Server Service Started", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onStart");
+	}
+	
+	public ServerService getServerService() {
+		return this;
 	}
 	
 	public void makeConnection() {
@@ -96,8 +102,28 @@ public class ServerService extends Service {
        fst.start();
 	}
 	
-    private String handleInputCommand(String input) {
-    	return input;
+    @SuppressWarnings("unused")
+	private void handleInput(final String input) {
+    	if (/*response desired*/false) {
+    		String response = input;
+    		try {
+				out.write(response);
+				out.flush();  // Don't forget to flush!	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+    	}
+       
+        handler.post(new Runnable() {
+            
+            public void run() {
+               if (delegate != null) {
+            	   delegate.serverServiceReceivedMessage(getServerService(), input);
+               }
+            }
+        });
     }
     
     private void postStatus(final String statusMessage, final int status) {
@@ -146,17 +172,7 @@ public class ServerService extends Service {
                             String line = null;
                             while ((line = in.readLine()) != null) {
                                 Log.d("ServerResponse:  ", line);
-
-                                out.write(handleInputCommand(line));
-                                out.flush();  // Don't forget to flush!
-                               
-                                handler.post(new Runnable() {
-                                    
-                                    public void run() {
-                                        // do whatever you want to the front end
-                                        // this is where you can be creative
-                                    }
-                                });
+                                handleInput(line);                        
                             }
                             break;
                         } catch (UnsupportedEncodingException e) {
@@ -181,4 +197,6 @@ public class ServerService extends Service {
 interface ServerServiceInterface {
 	
 	public void serverServiceStatusChange(String message, int status);
+	
+	public void serverServiceReceivedMessage(ServerService service, String message); 
 }

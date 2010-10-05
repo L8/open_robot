@@ -24,7 +24,8 @@ public class ClientService extends Service {
     private int serverPort = 8080; // default port
     private PrintWriter out;
     private boolean shouldTransmit = true;
-   
+    private ClientServiceInterface delegate;
+    
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -50,18 +51,18 @@ public class ClientService extends Service {
 	
 	@Override
 	public void onCreate() {
-		Toast.makeText(this, "Client Service Created", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Client Service Created", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onCreate");
     }
 	
 	@Override
 	public void onStart(Intent intent, int startid) {
-		Toast.makeText(this, "Client Service Started", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Client Service Started", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onStart");		
 	}
 	
 	public void makeConnection() {
-		Toast.makeText(this, "Making Connection", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Making Connection", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "makeConnection");
 		
 		if (!serverIpAddress.equals("")) {
@@ -71,7 +72,11 @@ public class ClientService extends Service {
 	}
 
 	private String getInputForServer() {
-		return "ClientMessage:  " + System.currentTimeMillis();
+		if (delegate != null) {
+			return delegate.messageToSend();
+		} else {
+			return null;
+		}
 	}
 
     public class ClientThread implements Runnable {
@@ -89,9 +94,12 @@ public class ClientService extends Service {
                             Log.d(TAG, "C: Sending command.");
                                 
                             // send message to Server
-                            out.println(getInputForServer());
+                            String toSend = getInputForServer();
+                            if (toSend != null) {
+                            	out.println(toSend);              
+                                Log.d(TAG, "C: Sent.");
+                            }
                             
-                            Log.d(TAG, "C: Sent.");
                         } catch (Exception e) {
                             Log.d(TAG, "S: Error", e);
                             // connected = false;
@@ -131,4 +139,18 @@ public class ClientService extends Service {
 		this.serverPort = serverPort;
 	}
 
+	public ClientServiceInterface getDelegate() {
+		return delegate;
+	}
+
+	public void setDelegate(ClientServiceInterface delegate) {
+		this.delegate = delegate;
+	}
+}
+
+interface ClientServiceInterface {
+	
+	public void clientServiceStatusChange(String message, int status);
+	
+	public String messageToSend(); 
 }
