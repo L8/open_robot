@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/start_server"
-          android:title="start_server" />
-    <item android:id="@+id/stop_server"
-          android:title="stop_server" />
-    <item android:id="@+id/start_client"          
-          android:title="start_client" />
-    <item android:id="@+id/stop_client"          
-          android:title="stop_client" />
+    <item android:id="@+id/toggle_server_state"
+          android:title="Start Server" />
+    <item android:id="@+id/toggle_client_state"
+          android:title="Start Client" />
 </menu>

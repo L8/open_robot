@@ -40,21 +40,9 @@
   		xmlns:android="http://schemas.android.com/apk/res/android"
   		android:background="#FF000000" 
   		android:gravity="center_vertical"
-  		android:layout_width="0px"
-  		android:layout_height="00px"
+  		android:layout_width="15px"
+  		android:layout_height="80px"
   		android:visibility="invisible"/>
-  		
-  		<Button android:id="@+id/client_connection_button"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:text="Client Connect" />
-    
-      		<Button android:id="@+id/server_connection_button"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:text="Server Connect" />
     
   	<Button android:id="@+id/kill_button"
     android:layout_width="fill_parent"

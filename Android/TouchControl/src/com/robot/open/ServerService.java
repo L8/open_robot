@@ -64,6 +64,7 @@ public class ServerService extends Service {
 	
 	@Override
 	public void onCreate() {
+		super.onCreate();
 		Toast.makeText(this, "Server Service Created", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onCreate");
 
@@ -73,21 +74,28 @@ public class ServerService extends Service {
 
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "Server Service Stopped", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "Server Service Destroyed", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onDestroy"); 
 		
 		 try {
-             // make sure you close the socket upon exiting
-             serverSocket.close();
-             out.flush();
-             out.close();
+             // make sure to close the socket upon exiting
+			 if (serverSocket != null) {
+				 serverSocket.close();	 
+			 }
+			 if (out != null) {
+				 out.flush();
+	             out.close();
+			 }
+             
          } catch (IOException e) {
              e.printStackTrace();
          }
+         super.onDestroy();
 	}
 	
 	@Override
 	public void onStart(Intent intent, int startid) {
+		super.onStart(intent, startid);
 		Toast.makeText(this, "Server Service Started", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "onStart");
 	}
@@ -97,9 +105,9 @@ public class ServerService extends Service {
 	}
 	
 	public void makeConnection() {
-
-       Thread fst = new Thread(new ServerThread());
-       fst.start();
+		Toast.makeText(this, "Making Connection", Toast.LENGTH_SHORT).show();
+		Thread fst = new Thread(new ServerThread());
+		fst.start();
 	}
 	
     @SuppressWarnings("unused")

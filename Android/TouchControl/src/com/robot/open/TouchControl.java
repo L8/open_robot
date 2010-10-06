@@ -53,52 +53,8 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
 	
 	private Intent clientServiceIntent;
 	private Intent serverServiceIntent;
-	
-	private ServiceConnection clientConnection = new ServiceConnection() {
-	    public void onServiceConnected(ComponentName className, IBinder service) {
-	        // This is called when the connection with the service has been
-	        // established, giving us the service object we can use to
-	        // interact with the service.  Because we have bound to a explicit
-	        // service that we know is running in our own process, we can
-	        // cast its IBinder to a concrete class and directly access it.
-	        clientService = ((ClientService.ClientBinder)service).getService();
-
-	        // Tell the user about this for our demo.
-	        Toast.makeText(currentContext(), R.string.client_service_connected, Toast.LENGTH_SHORT).show();
-	    }
-
-	    public void onServiceDisconnected(ComponentName className) {
-	        // This is called when the connection with the service has been
-	        // unexpectedly disconnected -- that is, its process crashed.
-	        // Because it is running in our same process, we should never
-	        // see this happen.
-	        clientService = null;
-	        //Toast.makeText(Binding.this, R.string.local_service_disconnected, Toast.LENGTH_SHORT).show();
-	    }
-	};
-	
-	private ServiceConnection serverConnection = new ServiceConnection() {
-	    public void onServiceConnected(ComponentName className, IBinder service) {
-	        // This is called when the connection with the service has been
-	        // established, giving us the service object we can use to
-	        // interact with the service.  Because we have bound to a explicit
-	        // service that we know is running in our own process, we can
-	        // cast its IBinder to a concrete class and directly access it.
-	        serverService = ((ServerService.ServerBinder)service).getService();
-
-	        // Tell the user about this for our demo.
-	        Toast.makeText(currentContext(), R.string.server_service_connected, Toast.LENGTH_SHORT).show();
-	    }
-
-	    public void onServiceDisconnected(ComponentName className) {
-	        // This is called when the connection with the service has been
-	        // unexpectedly disconnected -- that is, its process crashed.
-	        // Because it is running in our same process, we should never
-	        // see this happen.
-	        serverService = null;
-	        Toast.makeText(currentContext(), R.string.server_service_disconnected, Toast.LENGTH_SHORT).show();
-	    }
-	};
+	private ServiceConnection clientConnection;
+	private ServiceConnection serverConnection;
 
 
 	
@@ -113,8 +69,6 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
             Amarino.connect(this, DEVICE_ADDRESS);	
         }
         
-        serverServiceIntent = new Intent(this, ServerService.class);
-        clientServiceIntent = new Intent(this, ClientService.class);
         lastChange = System.currentTimeMillis();
         
         main = (FrameLayout) findViewById(R.id.main_view);
@@ -146,21 +100,6 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
             		killButton.setText("OK, Game On.");
             	}
             }         
-        });
-        
-        ((Button)this.findViewById(R.id.server_connection_button)).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	makeServerConnection();
-            	
-            }
-        });
-        
-        ((Button)this.findViewById(R.id.client_connection_button)).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	makeClientConnection();
-            }
         });
     }
     
@@ -213,24 +152,45 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     
         // Handle item selection
         switch (item.getItemId()) {
-        case R.id.start_server:
-            bindServerService();
+        case R.id.toggle_server_state:
+        	if (serverServiceIsBound) {
+        		unbindServerService();
+        	} else {
+        		bindServerService();	
+        	}
             return true;
-        case R.id.start_client:
-            bindClientService();
-            return true;
-        case R.id.stop_server:
-            unbindServerService();
-            return true;
-        case R.id.stop_client:
-            bindClientService();
+        case R.id.toggle_client_state:
+        	if (clientServiceIsBound) {
+        		unbindClientService();
+        	} else {
+        		bindClientService();	
+        	}
             return true;
         default:
             return super.onOptionsItemSelected(item);
         }
     }
     
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+    	MenuItem serverItem = menu.findItem(R.id.toggle_server_state);
+    	serverItem.setTitle(serverServiceIsBound ? R.string.stop_server : R.string.start_server);
+    	serverItem.setEnabled(!clientServiceIsBound);
+    	
+    	MenuItem clientItem = menu.findItem(R.id.toggle_client_state);
+    	clientItem.setTitle(clientServiceIsBound ? R.string.stop_client : R.string.start_client);
+    	clientItem.setEnabled(!serverServiceIsBound);
+    	return true;
+    }
+    
     private void bindServerService() {
+    	if (serverService != null) {
+    		unbindServerService();
+    	}
+    	
+    	serverServiceIntent = new Intent(this, ServerService.class);
+    	initServerServiceConnection();
+    	
     	// Establish a connection with the service.  We use an explicit
         // class name because we want a specific service implementation that
         // we know will be running in our own process (and thus won't be
@@ -242,13 +202,21 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     private void unbindServerService() {
     	if (serverServiceIsBound) {	
             // Detach our existing connection.
-            //unbindService(serverConnection);  // this was causing a crash so using stopService temporarily instead
-    		stopService(serverServiceIntent);
+            unbindService(serverConnection);
+            serverService = null;
+            serverServiceIntent = null;
             serverServiceIsBound = false;
         }
     }
     
     private void bindClientService() {
+    	if (clientServiceIsBound) {
+    		unbindClientService();
+    	}
+    	
+        clientServiceIntent = new Intent(this, ClientService.class);
+    	initClientServiceConnection();
+    	
     	// Establish a connection with the service.  We use an explicit
         // class name because we want a specific service implementation that
         // we know will be running in our own process (and thus won't be
@@ -260,8 +228,9 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     private void unbindClientService() {
     	if (clientServiceIsBound) {
             // Detach our existing connection.
-            //unbindService(clientConnection);   // this was causing a crash so using stopService temporarily instead
-    		stopService(clientServiceIntent);
+            unbindService(clientConnection);
+    		clientService = null;
+            clientServiceIntent = null;
             clientServiceIsBound = false;
         }
     }
@@ -354,5 +323,54 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
         intent.putExtra(AmarinoIntent.EXTRA_FLAG, methodFlag);
         intent.putExtra(AmarinoIntent.EXTRA_DATA, message);
         this.sendBroadcast(intent);
+    }
+    
+    private void initServerServiceConnection() {
+    	serverConnection = new ServiceConnection() {
+    	    public void onServiceConnected(ComponentName className, IBinder service) {
+    	        // This is called when the connection with the service has been
+    	        // established, giving us the service object we can use to
+    	        // interact with the service.  Because we have bound to a explicit
+    	        // service that we know is running in our own process, we can
+    	        // cast its IBinder to a concrete class and directly access it.
+    	        serverService = ((ServerService.ServerBinder)service).getService();
+
+    	        Toast.makeText(currentContext(), R.string.server_service_connected, Toast.LENGTH_SHORT).show();
+    	        makeServerConnection();
+    	    }
+
+    	    public void onServiceDisconnected(ComponentName className) {
+    	        // This is called when the connection with the service has been
+    	        // unexpectedly disconnected -- that is, its process crashed.
+    	        // Because it is running in our same process, we should never
+    	        // see this happen.
+    	        serverService = null;
+    	        Toast.makeText(currentContext(), R.string.server_service_disconnected, Toast.LENGTH_SHORT).show();
+    	    }
+    	};
+    }
+    
+    private void initClientServiceConnection() {
+    	clientConnection = new ServiceConnection() {
+    	    public void onServiceConnected(ComponentName className, IBinder service) {
+    	        // This is called when the connection with the service has been
+    	        // established, giving us the service object we can use to
+    	        // interact with the service.  Because we have bound to a explicit
+    	        // service that we know is running in our own process, we can
+    	        // cast its IBinder to a concrete class and directly access it.
+    	        clientService = ((ClientService.ClientBinder)service).getService();
+    	        Toast.makeText(currentContext(), R.string.client_service_connected, Toast.LENGTH_SHORT).show();
+    	        makeClientConnection();
+    	    }
+
+    	    public void onServiceDisconnected(ComponentName className) {
+    	        // This is called when the connection with the service has been
+    	        // unexpectedly disconnected -- that is, its process crashed.
+    	        // Because it is running in our same process, we should never
+    	        // see this happen.
+    	        clientService = null;
+    	        Toast.makeText(currentContext(), R.string.client_service_disconnected, Toast.LENGTH_SHORT).show();
+    	    }
+    	};
     }
 }

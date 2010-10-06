@@ -1,6 +1,7 @@
 package com.robot.open;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -22,6 +23,7 @@ public class ClientService extends Service {
     private boolean connected = false;
     private Handler handler = new Handler();
     private int serverPort = 8080; // default port
+    private Socket clientSocket;
     private PrintWriter out;
     private boolean shouldTransmit = true;
     private ClientServiceInterface delegate;
@@ -55,6 +57,28 @@ public class ClientService extends Service {
 		Log.d(TAG, "onCreate");
     }
 	
+
+	@Override
+	public void onDestroy() {
+		Toast.makeText(this, "Client Service Destroyed", Toast.LENGTH_SHORT).show();
+		Log.d(TAG, "onDestroy"); 
+		
+		 try {
+             // make sure to close the socket upon exiting
+			 if (clientSocket != null) {
+				 clientSocket.close();	 
+			 }
+			 if (out != null) {
+				 out.flush();
+	             out.close();
+			 }
+             
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+         super.onDestroy();
+	}
+	
 	@Override
 	public void onStart(Intent intent, int startid) {
 		Toast.makeText(this, "Client Service Started", Toast.LENGTH_SHORT).show();
@@ -85,9 +109,9 @@ public class ClientService extends Service {
             try {
                 InetAddress serverAddr = InetAddress.getByName(serverIpAddress);
                 Log.d(TAG, "C: Connecting...");
-                Socket socket = new Socket(serverAddr, serverPort);
+                clientSocket = new Socket(serverAddr, serverPort);
                 connected = true;
-                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream())), true);
                 while (connected) {
                 	if (shouldTransmit) {
                         try {
@@ -106,7 +130,7 @@ public class ClientService extends Service {
                         }
                 	}
                 }
-                socket.close();
+                clientSocket.close();
                 Log.d(TAG, "C: Closed.");
             } catch (Exception e) {
                 Log.e(TAG, "C: Error", e);
