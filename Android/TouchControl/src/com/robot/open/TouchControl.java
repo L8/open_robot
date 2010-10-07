@@ -1,10 +1,12 @@
 package com.robot.open;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -22,12 +24,27 @@ import at.abraxas.amarino.Amarino;
 import at.abraxas.amarino.AmarinoIntent;
  
 public class TouchControl extends Activity implements ThumbBallListener, ServerServiceInterface, 
-						ClientServiceInterface {
+						ClientServiceInterface, EditTextDialogInterface {
 	
-	private static final String DEVICE_ADDRESS = "00:07:80:91:32:51";
+	private final String DEVICE_ADDRESS = "00:07:80:91:32:51";
 	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
 	private static final char ARDUINO_SHOULD_KILL_FUNCTION_FLAG = 'd';
-	private static final boolean BLUETOOTH_ENABLED = false; 
+	private final boolean BLUETOOTH_ENABLED = false; 
+	
+	private static final int ARDUINO_MAC_DIALOG_TAG = 1;
+	private static final int SERVER_IP_DIALOG_TAG = 2;
+	private static final int SERVER_PORT_DIALOG_TAG = 3;
+	private static final int DEFINE_SERVER_PORT_DIALOG_TAG = 4;
+	
+	private static final String ARDUINO_MAC_ADDRESS_KEY = "ARDUINO_MAC_ADDRESS";
+	private static final String SERVER_IP_ADDRESS_KEY = "SERVER_IP_ADDRESS";
+	private static final String SERVER_PORT_ADDRESS_KEY = "SERVER_PORT_ADDRESS";
+	private static final String DEFINE_SERVER_PORT_ADDRESS_KEY = "DEFINE_SERVER_PORT_ADDRESS";
+	
+	private static final String DEFAULT_ARDUINO_MAC_ADDRESS = "00:07:80:91:32:51";
+	private static final String DEFAULT_SERVER_IP_ADDRESS = "192.168.1.164";
+	private static final int DEFAULT_SERVER_PORT_ADDRESS = 8080;
+	
 	
 	public final static int DELAY = 150;
 	public final static int FRAME_WIDTH = 250;
@@ -105,12 +122,12 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     
     void makeServerConnection() {
     	serverService.setDelegate(this);
-    	serverService.makeConnection();
+    	serverService.makeConnection(getDefinedServerPortAddress());
     }
     
     void makeClientConnection() {
     	clientService.setDelegate(this);
-    	clientService.makeConnection();
+    	clientService.makeConnection(getServerIPAddress(), getServerPortAddress());
     }
     
     @Override
@@ -166,6 +183,21 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
         		bindClientService();	
         	}
             return true;
+        case R.id.set_arduino_mac:
+        	letUserSetArduinoMacAddress();
+        	return true;
+        case R.id.define_server_port:
+        	letUserDefineServerPort();
+        	return true;
+        case R.id.set_server_ip:
+        	letUserSetServerIPAddress();
+        	return true;
+        case R.id.set_server_port:
+        	letUserSetServerPort();
+        	return true;
+        case R.id.server_settings:
+        case R.id.client_settings:
+        case R.id.curr_server_ip:
         default:
             return super.onOptionsItemSelected(item);
         }
@@ -180,8 +212,61 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     	MenuItem clientItem = menu.findItem(R.id.toggle_client_state);
     	clientItem.setTitle(clientServiceIsBound ? R.string.stop_client : R.string.start_client);
     	clientItem.setEnabled(!serverServiceIsBound);
+    	
+    	MenuItem currServerIPItem = menu.findItem(R.id.curr_server_ip);
+    	currServerIPItem.setTitle("Server IP:  " + NetworkHelper.getLocalIpAddress());
+    	currServerIPItem.setEnabled(false);
+    	
+    	MenuItem arduinoMACItem = menu.findItem(R.id.set_arduino_mac);
+    	arduinoMACItem.setTitle("Arduino:  " + getArduinoMACAddress());
+    	MenuItem defineServerPort = menu.findItem(R.id.define_server_port);
+    	defineServerPort.setTitle("Server Port #:  " + Integer.toString(getDefinedServerPortAddress()));
+    	MenuItem setServerPort = menu.findItem(R.id.set_server_port);
+    	setServerPort.setTitle("Server Port #:  " + Integer.toString(getServerPortAddress()));
+    	MenuItem setServerIP = menu.findItem(R.id.set_server_ip);
+    	setServerIP.setTitle("Server IP:  " + getServerIPAddress());
+    	
     	return true;
     }
+    
+    // Methods used in Server App
+    private void letUserSetArduinoMacAddress() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Arduino MAC", 
+    			this.getArduinoMACAddress(), this, ARDUINO_MAC_DIALOG_TAG).show();
+    }
+    
+    private void letUserDefineServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Define Server Port", 
+    			Integer.toString(this.getDefinedServerPortAddress()), this, DEFINE_SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    // Methods used in Client App
+    private void letUserSetServerIPAddress() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Server IP", 
+    			this.getServerIPAddress(), this, SERVER_IP_DIALOG_TAG).show();
+    }
+    
+    private void letUserSetServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Server Port", 
+    			Integer.toString(this.getServerPortAddress()), this, SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    
+    // EditTextDialogInterface
+    public void dialogFinishedWithStatus(boolean positiveStatus, String endingString, int tag) {
+    	if (positiveStatus) {
+    		if (tag == ARDUINO_MAC_DIALOG_TAG) {
+    			this.setPreferenceStringForKey(ARDUINO_MAC_ADDRESS_KEY, endingString);
+    		} else if (tag == DEFINE_SERVER_PORT_DIALOG_TAG) {
+    			this.setPreferenceIntForKey(DEFINE_SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		} else if (tag == SERVER_IP_DIALOG_TAG) {
+    			this.setPreferenceStringForKey(SERVER_IP_ADDRESS_KEY, endingString);
+    		} else if (tag == SERVER_PORT_DIALOG_TAG) {
+    			this.setPreferenceIntForKey(SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		}
+    	}
+    }
+
     
     private void bindServerService() {
     	if (serverService != null) {
@@ -227,6 +312,7 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     
     private void unbindClientService() {
     	if (clientServiceIsBound) {
+    		clientService.closeConnection();
             // Detach our existing connection.
             unbindService(clientConnection);
     		clientService = null;
@@ -373,4 +459,53 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     	    }
     	};
     }
+    
+    // Preferences changed in Server App
+    private String getArduinoMACAddress() {
+    	return this.getPreferenceStringForKey(ARDUINO_MAC_ADDRESS_KEY, DEFAULT_ARDUINO_MAC_ADDRESS);
+    }
+    
+    private int getDefinedServerPortAddress() {
+    	return this.getPreferenceIntForKey(DEFINE_SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    }
+        
+    // Preferences changed in Client App
+    private String getServerIPAddress() {
+    	return this.getPreferenceStringForKey(SERVER_IP_ADDRESS_KEY, DEFAULT_SERVER_IP_ADDRESS);
+    }
+    
+    private int getServerPortAddress() {
+    	return this.getPreferenceIntForKey(SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    }
+    
+    
+    // ************************************************************************
+    // PREFERENCES UTILITY FUNCTIONS
+    // ************************************************************************
+    
+    private String getPreferenceStringForKey(String key, String defVal) {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+    	return settings.getString(key, defVal);
+    }
+    
+    private void setPreferenceStringForKey(String key, String string) {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(key, string);
+        editor.commit();
+    }
+    
+    private int getPreferenceIntForKey(String key, int defVal) {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+    	return settings.getInt(key, defVal);
+    }
+    
+    private void setPreferenceIntForKey(String key, int theInt) {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt(key, theInt);
+        editor.commit();
+    }
+    
+    
 }

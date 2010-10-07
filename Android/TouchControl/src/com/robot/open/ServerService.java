@@ -30,7 +30,7 @@ public class ServerService extends Service {
 	public static final String SERVER_DELIMITER = "  ";
 	
     public static String SERVERIP = "10.0.2.15";   	// default ip...
-    public static final int SERVERPORT = 8080;		// default a port
+    private int serverPort;
 
     private static final String TAG = "ServerService";
     private Handler handler = new Handler();
@@ -104,7 +104,8 @@ public class ServerService extends Service {
 		return this;
 	}
 	
-	public void makeConnection() {
+	public void makeConnection(int port) {
+		this.serverPort = port;
 		Toast.makeText(this, "Making Connection", Toast.LENGTH_SHORT).show();
 		Thread fst = new Thread(new ServerThread());
 		fst.start();
@@ -163,7 +164,7 @@ public class ServerService extends Service {
                 	postStatus("Listening on IP: " + SERVERIP, SERVER_SERVICE_STATUS_LISTENING);
                     Log.d(TAG, "Got IP, now listening...");
                     
-                    serverSocket = new ServerSocket(SERVERPORT);
+                    serverSocket = new ServerSocket(serverPort);
                     while (true) {
                         // listen for incoming clients
                         Socket client = serverSocket.accept();

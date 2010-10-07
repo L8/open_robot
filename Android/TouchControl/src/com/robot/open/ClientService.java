@@ -19,10 +19,10 @@ public class ClientService extends Service {
 
 	
 	private static final String TAG = "ClientService";
-    private String serverIpAddress = "192.168.0.164";
+    private String serverIpAddress;
+    private int serverPort;
     private boolean connected = false;
     private Handler handler = new Handler();
-    private int serverPort = 8080; // default port
     private Socket clientSocket;
     private PrintWriter out;
     private boolean shouldTransmit = true;
@@ -85,7 +85,9 @@ public class ClientService extends Service {
 		Log.d(TAG, "onStart");		
 	}
 	
-	public void makeConnection() {
+	public void makeConnection(String serverIp, int serverPort) {
+		this.serverIpAddress = serverIp;
+		this.serverPort = serverPort;
 		Toast.makeText(this, "Making Connection", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "makeConnection");
 		
@@ -93,6 +95,10 @@ public class ClientService extends Service {
             Thread cThread = new Thread(new ClientThread());
             cThread.start();
         }
+	}
+	
+	public void closeConnection() {
+		connected = false;
 	}
 
 	private String getInputForServer() {
@@ -108,7 +114,7 @@ public class ClientService extends Service {
         public void run() {
             try {
                 InetAddress serverAddr = InetAddress.getByName(serverIpAddress);
-                Log.d(TAG, "C: Connecting...");
+                Log.d(TAG, "C: Connecting to:  " + serverIpAddress);
                 clientSocket = new Socket(serverAddr, serverPort);
                 connected = true;
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream())), true);
@@ -129,6 +135,8 @@ public class ClientService extends Service {
                             // connected = false;
                         }
                 	}
+                	Thread.currentThread();
+					Thread.sleep(10); //sleep for 10 ms
                 }
                 clientSocket.close();
                 Log.d(TAG, "C: Closed.");
