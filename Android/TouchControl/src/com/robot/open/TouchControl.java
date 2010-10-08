@@ -353,6 +353,7 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     		thumbBall.setX(x);
     		thumbBall.setY(y);
     		thumbBall.invalidate();
+    		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
     	}
     }
     
