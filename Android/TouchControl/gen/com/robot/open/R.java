@@ -41,14 +41,15 @@ public final class R {
         public static final int options_menu=0x7f050000;
     }
     public static final class string {
-        public static final int app_name=0x7f040000;
-        public static final int client_service_connected=0x7f040005;
-        public static final int client_service_disconnected=0x7f040007;
-        public static final int server_service_connected=0x7f040006;
-        public static final int server_service_disconnected=0x7f040008;
-        public static final int start_client=0x7f040002;
-        public static final int start_server=0x7f040001;
-        public static final int stop_client=0x7f040004;
-        public static final int stop_server=0x7f040003;
+        public static final int app_name=0x7f040001;
+        public static final int client_service_connected=0x7f040006;
+        public static final int client_service_disconnected=0x7f040008;
+        public static final int hello=0x7f040000;
+        public static final int server_service_connected=0x7f040007;
+        public static final int server_service_disconnected=0x7f040009;
+        public static final int start_client=0x7f040003;
+        public static final int start_server=0x7f040002;
+        public static final int stop_client=0x7f040005;
+        public static final int stop_server=0x7f040004;
     }
 }

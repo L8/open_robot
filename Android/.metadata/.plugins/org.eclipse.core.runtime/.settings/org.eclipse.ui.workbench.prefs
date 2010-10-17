@@ -1,3 +1,4 @@
-#Sun Aug 08 15:47:59 PDT 2010
+#Sat Oct 16 19:02:53 PDT 2010
 eclipse.preferences.version=1
+org.eclipse.ui.commands=<?xml version\="1.0" encoding\="UTF-8"?>\n<org.eclipse.ui.commands>\n<activeKeyConfiguration keyConfigurationId\="org.eclipse.ui.emacsAcceleratorConfiguration"/>\n</org.eclipse.ui.commands>
 ENABLED_DECORATORS=com.android.ide.eclipse.adt.project.FolderDecorator\:true,org.eclipse.jdt.ui.override.decorator\:true,org.eclipse.jdt.ui.interface.decorator\:false,org.eclipse.jdt.ui.buildpath.decorator\:true,org.eclipse.mylyn.context.ui.decorator.interest\:true,org.eclipse.mylyn.tasks.ui.decorators.task\:true,org.eclipse.mylyn.team.ui.changeset.decorator\:true,org.eclipse.team.cvs.ui.decorator\:true,org.eclipse.ui.LinkedResourceDecorator\:true,org.eclipse.ui.VirtualResourceDecorator\:true,org.eclipse.ui.ContentTypeDecorator\:true,org.eclipse.ui.ResourceFilterDecorator\:false,

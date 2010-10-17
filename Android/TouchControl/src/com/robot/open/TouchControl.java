@@ -1,7 +1,7 @@
 package com.robot.open;
 
+
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +22,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 import at.abraxas.amarino.Amarino;
 import at.abraxas.amarino.AmarinoIntent;
+
+import com.openrobot.common.ClientService;
+import com.openrobot.common.ClientServiceInterface;
+import com.openrobot.common.DialogHelper;
+import com.openrobot.common.EditTextDialogInterface;
+import com.openrobot.common.NetworkHelper;
+import com.openrobot.common.ServerService;
+import com.openrobot.common.ServerServiceInterface;
+import com.openrobot.common.ThumbBall;
+import com.openrobot.common.ThumbBallListener;
  
 public class TouchControl extends Activity implements ThumbBallListener, ServerServiceInterface, 
 						ClientServiceInterface, EditTextDialogInterface {
@@ -47,8 +57,6 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
 	
 	
 	public final static int DELAY = 150;
-	public final static int FRAME_WIDTH = 250;
-	public final static int FRAME_HEIGHT = 250;
 	public final static int CIRCLE_RADIUS = 40;
 	
 	private ThumbBall thumbBall;
@@ -133,8 +141,8 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     @Override
     public void onStart() {
     	super.onStart();
-    	thumbBall.setX(FRAME_WIDTH / 2);
-    	thumbBall.setY(FRAME_HEIGHT / 2);
+    	thumbBall.setX(ThumbBall.FRAME_WIDTH / 2);
+    	thumbBall.setY(ThumbBall.FRAME_HEIGHT / 2);
     	thumbBall.invalidate();
     }
     
