@@ -1,0 +1,21 @@
+
+public class JavaPlayGround {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		SleepyClientService scs = new SleepyClientService();
+		
+		int i = 0;
+		while (true) {
+			String stringy = "MyString" + Integer.toString(i);
+			i++;
+			scs.setString(stringy);
+			
+		}
+
+	}
+
+}

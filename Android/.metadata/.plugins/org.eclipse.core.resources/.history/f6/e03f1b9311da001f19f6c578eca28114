@@ -1,0 +1,29 @@
+
+public class SleepyClientService {
+	
+	Object data = null;
+    public void push(Object d) {
+        data = d;
+    }
+    public Object pop() {
+        Object d = data;
+        data = null;
+        return d;
+    }
+    class Producer implements Runnable {
+        public void run() {
+            while (true) {
+                Object o = createNewObject();
+                push(o);
+            }
+        }
+    }
+    class Consumer implements Runnable {
+        public void run() {
+            while (true) {
+                Object o = pop();
+                doSomethingWith(o);
+            }
+        }
+    }
+}

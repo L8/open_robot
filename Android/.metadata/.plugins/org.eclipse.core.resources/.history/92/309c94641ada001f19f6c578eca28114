@@ -1,0 +1,31 @@
+
+public class JavaPlayGround implements SleepyProducerConsumerInterface {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		SleepyClientService scs = new SleepyClientService();
+		
+		int i = 0;
+		while (true) {
+			String stringy = "MyString" + Integer.toString(i);
+			i++;
+			System.out.println("Setting string in Main Loop");
+			scs.setString(stringy);
+			try {
+				Thread.currentThread();
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+	
+	public void sleepyConsumerThreadPoppedObject(Object theObject) {
+		
+	}
+
+}

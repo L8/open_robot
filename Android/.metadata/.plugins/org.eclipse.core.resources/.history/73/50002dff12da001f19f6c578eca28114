@@ -1,0 +1,66 @@
+
+public class SleepyClientService {
+	
+	Object dataStore = null;
+	Object data = null;
+	
+	Object full  = new Object();
+    Object empty = new Object();
+    
+    public void push(Object d) {
+        synchronized(full) {
+            if (data != null)
+				try {
+					full.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+        }
+        data = d;
+        synchronized(empty) {
+            if (data != null) empty.notify();
+        }
+    }
+    
+    public Object pop() {
+        synchronized(empty) {
+            if (data == null)
+				try {
+					empty.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+        }
+        Object o = data;
+        data = null;
+        synchronized(full) {
+            if (data == null) full.notify();
+        }
+        return o;
+    }
+    
+    class Producer implements Runnable {
+        public void run() {
+            while (true) {
+            	while (dataStore == null) {
+            		try {
+						dataStore.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+            	}
+                Object o = null;//createNewObject();
+                push(o);
+            }
+        }
+    }
+    class Consumer implements Runnable {
+        public void run() {
+            while (true) {
+                Object o = pop();
+                //doSomethingWith(o);
+            }
+        }
+    }
+}
+

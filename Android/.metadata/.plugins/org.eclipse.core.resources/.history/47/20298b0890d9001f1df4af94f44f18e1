@@ -1,0 +1,62 @@
+package com.openrobot.common;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+
+public class DialogHelper {
+
+	public static AlertDialog textEntryAlertDialog(Activity context, String title,
+			String editTextString, final EditTextDialogInterface delegate, final int tag) {
+				
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View layout = inflater.inflate(R.layout.string_setting_dialog, (ViewGroup) context.findViewById(R.id.dialog_root_view));
+    	
+    	final EditText dialogEditText = (EditText)layout.findViewById(R.id.dialog_edittext);
+    	dialogEditText.setText(editTextString);
+    	
+    	DialogInterface.OnClickListener okayListener = new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				String text = dialogEditText.getText().toString();
+				delegate.dialogFinishedWithStatus(true, text, tag);
+			}
+		};
+		
+		DialogInterface.OnClickListener cancelListener = new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				String text = dialogEditText.getText().toString();
+				delegate.dialogFinishedWithStatus(false, text, tag);
+			}
+		};
+    	
+    	
+    	AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setMessage(title)
+	       .setCancelable(false)
+	       .setPositiveButton("Okay", okayListener)
+	       .setNegativeButton("Cancel", cancelListener);
+    	
+    	
+    	builder.setView(layout);
+    	
+    	AlertDialog dialog = builder.create();
+		
+		return dialog;
+	}
+}
+
+
+interface EditTextDialogInterface {
+	public void dialogFinishedWithStatus(boolean positiveStatus, String endingString, int tag);	
+}

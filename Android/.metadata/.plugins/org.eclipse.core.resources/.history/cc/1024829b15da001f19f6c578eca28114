@@ -1,0 +1,14 @@
+
+public class JavaPlayGround {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		
+		SleepyClientService scs = new SleepyClientService();
+		
+
+	}
+
+}

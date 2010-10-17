@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy 2 elements to &apos;OpenRobotLibrary/src/com.openrobot.common&apos;&#x0A;- Original project: &apos;JavaPlayGround&apos;&#x0A;- Destination element: &apos;OpenRobotLibrary/src/com.openrobot.common&apos;&#x0A;- Original elements:&#x0A;     SleepyProducerConsumer.java&#x0A;     SleepyProducerConsumerInterface.java" description="Copy compilation units" destination="=OpenRobotLibrary/src&lt;com.openrobot.common" element1="/src&lt;{SleepyProducerConsumer.java" element2="/src&lt;{SleepyProducerConsumerInterface.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1287340301749" units="2" version="1.0"/>
+</session>

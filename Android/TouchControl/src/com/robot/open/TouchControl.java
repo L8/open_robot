@@ -340,6 +340,16 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
 		xPosTextView.setText(Integer.toString(tb.translatedX()));
 		yPosTextView.setText(Integer.toString(-tb.translatedY()));
 		
+		if (clientService != null && clientService.isConnected()) {
+			Float xFloat = new Float(thumbBall.getX());
+			Float yFloat = new Float(thumbBall.getY());
+			
+			String stringToSend = xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
+			if (!clientService.sendStringToServer(stringToSend)) {
+				Log.d("TouchControl", "ClientService wasn't able to send String");
+			}
+		}
+		
 		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
 	}
     
@@ -375,6 +385,10 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
 		Float xFloat = new Float(thumbBall.getX());
 		Float yFloat = new Float(thumbBall.getY());
 		return xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
+	}
+	
+	public void clientServiceReceivedResponse(ClientService theClientService, String response) {
+		
 	}
  
     private void messageArduinoIfAppropriate(int x, int y) {

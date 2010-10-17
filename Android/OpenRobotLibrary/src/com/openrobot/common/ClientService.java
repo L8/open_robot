@@ -15,7 +15,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-public class ClientService extends Service {
+public class ClientService extends Service implements SleepyProducerConsumerInterface {
 
 	
 	private static final String TAG = "ClientService";
@@ -27,6 +27,8 @@ public class ClientService extends Service {
     private PrintWriter out;
     private boolean shouldTransmit = true;
     private ClientServiceInterface delegate;
+    private SleepyProducerConsumer sleepyProducerConsumer;
+    private String stringToSend = null;
     
     /**
      * Class for clients to access.  Because we know this service always
@@ -91,6 +93,8 @@ public class ClientService extends Service {
 		Toast.makeText(this, "Making Connection", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "makeConnection");
 		
+		sleepyProducerConsumer = new SleepyProducerConsumer(this);
+		
 		if (!serverIpAddress.equals("")) {
             Thread cThread = new Thread(new ClientThread());
             cThread.start();
@@ -100,13 +104,9 @@ public class ClientService extends Service {
 	public void closeConnection() {
 		connected = false;
 	}
-
-	private String getInputForServer() {
-		if (delegate != null) {
-			return delegate.messageToSend();
-		} else {
-			return null;
-		}
+	
+	public boolean sendStringToServer(String theString) {
+		return sleepyProducerConsumer.setProducerData(theString);
 	}
 
     public class ClientThread implements Runnable {
@@ -121,10 +121,17 @@ public class ClientService extends Service {
                 while (connected) {
                 	if (shouldTransmit) {
                         try {
-                            Log.d(TAG, "C: Sending command.");
-                                
+                        	if (stringToSend == null) {
+                        		 Log.d(TAG, "C: Waiting on sleepyProducerConsumer.");
+                                 synchronized (sleepyProducerConsumer) {
+                                 	sleepyProducerConsumer.wait();	
+                                 } 
+                                 Log.d(TAG, "C: Woken up and proceeding to send data");	
+                        	}                         
                             // send message to Server
-                            String toSend = getInputForServer();
+                            String toSend = stringToSend;
+                            stringToSend = null;
+                            
                             if (toSend != null) {
                             	out.println(toSend);              
                                 Log.d(TAG, "C: Sent.");
@@ -135,8 +142,6 @@ public class ClientService extends Service {
                             // connected = false;
                         }
                 	}
-                	Thread.currentThread();
-					Thread.sleep(10); //sleep for 10 ms
                 }
                 clientSocket.close();
                 Log.d(TAG, "C: Closed.");
@@ -146,6 +151,16 @@ public class ClientService extends Service {
             }
         }
     }
+    
+	public void sleepyConsumerThreadPoppedObject(Object theObject) {
+		if (stringToSend != null) {
+			Log.d(TAG, "StringToSend not null, overwriting");
+		}
+		stringToSend = (String) theObject;
+		 synchronized (sleepyProducerConsumer) {
+         	sleepyProducerConsumer.notify();	
+         } 
+	}
     
     public boolean getShouldTransmit() {
     	return this.shouldTransmit;
@@ -177,5 +192,13 @@ public class ClientService extends Service {
 
 	public void setDelegate(ClientServiceInterface delegate) {
 		this.delegate = delegate;
+	}
+
+	public boolean isConnected() {
+		return connected;
+	}
+
+	public void setConnected(boolean connected) {
+		this.connected = connected;
 	}
 }

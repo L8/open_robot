@@ -1,0 +1,5 @@
+
+
+public interface SleepyProducerConsumerInterface {
+	public void sleepyConsumerThreadPoppedObject(Object theObject);
+}
