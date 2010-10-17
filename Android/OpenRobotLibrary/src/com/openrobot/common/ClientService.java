@@ -1,7 +1,9 @@
 package com.openrobot.common;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -22,6 +24,8 @@ public class ClientService extends Service implements SleepyProducerConsumerInte
     private String serverIpAddress;
     private int serverPort;
     private boolean connected = false;
+    private boolean shouldWaitForServerResponse = false;
+    private boolean currentlyWaitingForServerResponse = false;
     private Handler handler = new Handler();
     private Socket clientSocket;
     private PrintWriter out;
@@ -87,9 +91,10 @@ public class ClientService extends Service implements SleepyProducerConsumerInte
 		Log.d(TAG, "onStart");		
 	}
 	
-	public void makeConnection(String serverIp, int serverPort) {
+	public void makeConnection(String serverIp, int serverPort, boolean waitForServerResponse) {
 		this.serverIpAddress = serverIp;
 		this.serverPort = serverPort;
+		this.shouldWaitForServerResponse = waitForServerResponse;
 		Toast.makeText(this, "Making Connection", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "makeConnection");
 		
@@ -117,25 +122,30 @@ public class ClientService extends Service implements SleepyProducerConsumerInte
                 Log.d(TAG, "C: Connecting to:  " + serverIpAddress);
                 clientSocket = new Socket(serverAddr, serverPort);
                 connected = true;
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream())), true);
+                String line = null;
                 while (connected) {
                 	if (shouldTransmit) {
                         try {
-                        	if (stringToSend == null) {
+                        	if (stringToSend != null && !currentlyWaitingForServerResponse) {
+                        		 // send message to Server      
+                            	out.println(stringToSend);              
+                                Log.d(TAG, "C: Sent.");
+                                stringToSend = null;
+                                if (shouldWaitForServerResponse) {
+                                	currentlyWaitingForServerResponse = true;
+                                }                             
+                        	} else if (currentlyWaitingForServerResponse && (line = in.readLine()) != null) {
+                        		delegate.clientServiceReceivedResponse(getThis(), line);
+                        		currentlyWaitingForServerResponse = false;
+                        	} else {
                         		 Log.d(TAG, "C: Waiting on sleepyProducerConsumer.");
                                  synchronized (sleepyProducerConsumer) {
                                  	sleepyProducerConsumer.wait();	
                                  } 
                                  Log.d(TAG, "C: Woken up and proceeding to send data");	
-                        	}                         
-                            // send message to Server
-                            String toSend = stringToSend;
-                            stringToSend = null;
-                            
-                            if (toSend != null) {
-                            	out.println(toSend);              
-                                Log.d(TAG, "C: Sent.");
-                            }
+                        	}
                             
                         } catch (Exception e) {
                             Log.d(TAG, "S: Error", e);
@@ -160,6 +170,10 @@ public class ClientService extends Service implements SleepyProducerConsumerInte
 		 synchronized (sleepyProducerConsumer) {
          	sleepyProducerConsumer.notify();	
          } 
+	}
+	
+	private ClientService getThis() {
+		return this;
 	}
     
     public boolean getShouldTransmit() {

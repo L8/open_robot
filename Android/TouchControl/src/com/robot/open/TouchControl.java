@@ -135,7 +135,7 @@ public class TouchControl extends Activity implements ThumbBallListener, ServerS
     
     void makeClientConnection() {
     	clientService.setDelegate(this);
-    	clientService.makeConnection(getServerIPAddress(), getServerPortAddress());
+    	clientService.makeConnection(getServerIPAddress(), getServerPortAddress(), false);
     }
     
     @Override
