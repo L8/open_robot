@@ -1,0 +1,488 @@
+package com.openrobot.touchrobot;
+
+import com.openrobot.common.AmarinoService;
+import com.openrobot.common.ClientService;
+import com.openrobot.common.ClientServiceInterface;
+import com.openrobot.common.DialogHelper;
+import com.openrobot.common.EditTextDialogInterface;
+import com.openrobot.common.NetworkHelper;
+import com.openrobot.common.ServerService;
+import com.openrobot.common.ServerServiceInterface;
+import com.openrobot.common.ThumbBall;
+import com.openrobot.common.ThumbBallListener;
+
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class BeRobotActivity extends Activity implements ThumbBallListener, ServerServiceInterface, 
+						ClientServiceInterface, EditTextDialogInterface {
+	
+	private final String DEVICE_ADDRESS = "00:07:80:91:32:51";
+	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
+	private static final char ARDUINO_SHOULD_KILL_FUNCTION_FLAG = 'd';
+	private final boolean BLUETOOTH_ENABLED = false; 
+	
+	private static final int ARDUINO_MAC_DIALOG_TAG = 1;
+	private static final int SERVER_IP_DIALOG_TAG = 2;
+	private static final int SERVER_PORT_DIALOG_TAG = 3;
+	private static final int DEFINE_SERVER_PORT_DIALOG_TAG = 4;
+	
+	private static final String ARDUINO_MAC_ADDRESS_KEY = "ARDUINO_MAC_ADDRESS";
+	private static final String SERVER_IP_ADDRESS_KEY = "SERVER_IP_ADDRESS";
+	private static final String SERVER_PORT_ADDRESS_KEY = "SERVER_PORT_ADDRESS";
+	private static final String DEFINE_SERVER_PORT_ADDRESS_KEY = "DEFINE_SERVER_PORT_ADDRESS";
+	
+	private static final String DEFAULT_ARDUINO_MAC_ADDRESS = "00:07:80:91:32:51";
+	private static final String DEFAULT_SERVER_IP_ADDRESS = "192.168.1.164";
+	private static final int DEFAULT_SERVER_PORT_ADDRESS = 8080;
+	
+	
+	public final static int DELAY = 150;
+	public final static int CIRCLE_RADIUS = 40;
+	
+	private ThumbBall thumbBall;
+	private TextView xPosTextView;
+	private TextView yPosTextView;
+	private FrameLayout main;
+	private Button killButton;
+	
+	private boolean shouldKill = false;
+	private boolean shouldEnable = false;
+	private boolean killEnabled = false;
+	
+	private ClientService clientService;
+	private ServerService serverService;
+	boolean clientServiceIsBound;
+	boolean serverServiceIsBound;
+	
+	private long lastChange;
+	
+	private Intent clientServiceIntent;
+	private Intent serverServiceIntent;
+	private ServiceConnection clientConnection;
+	private ServiceConnection serverConnection;
+	
+	private AmarinoService amarinoService;
+
+	@Override
+	  public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.be_robot_main);
+	          
+        if (BLUETOOTH_ENABLED) {
+        	amarinoService = new AmarinoService(this, DEVICE_ADDRESS);
+        }
+        
+        lastChange = System.currentTimeMillis();
+        
+        main = (FrameLayout) findViewById(R.id.main_view);
+        main.setBackgroundColor(Color.CYAN);
+        
+        xPosTextView = (TextView)findViewById(R.id.x_position_textview);
+        yPosTextView = (TextView)findViewById(R.id.y_position_textview);
+        
+        thumbBall = new ThumbBall(this, 
+        		(main.getRight() - main.getLeft()) / 2, 
+        		(main.getBottom() - main.getTop()) / 2 ,
+        		CIRCLE_RADIUS);
+        thumbBall.setDelegate(this);
+        main.addView(thumbBall);
+        
+        this.killButton = (Button)this.findViewById(R.id.kill_button);
+        this.killButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	if (killEnabled) {
+            		shouldEnable = true;
+            		shouldKill = false;
+            		killEnabled = false;
+            		killButton.setText("Stop, please");
+            	} else {
+            		shouldEnable = false;
+            		shouldKill = true;
+            		killEnabled = true;
+            		killButton.setText("OK, Game On.");
+            	}
+            }         
+        });
+    }
+    
+    void makeServerConnection() {
+    	serverService.setDelegate(this);
+    	serverService.makeConnection(getDefinedServerPortAddress());
+    }
+    
+    void makeClientConnection() {
+    	clientService.setDelegate(this);
+    	clientService.makeConnection(getServerIPAddress(), getServerPortAddress(), false);
+    }
+    
+    @Override
+    public void onStart() {
+    	super.onStart();
+    	thumbBall.setX(ThumbBall.FRAME_WIDTH / 2);
+    	thumbBall.setY(ThumbBall.FRAME_HEIGHT / 2);
+    	thumbBall.invalidate();
+    }
+    
+    @Override
+	protected void onStop() {
+		super.onStop();
+		
+		// Housekeeping
+		if (amarinoService != null) {
+			amarinoService.disconnect();
+		}
+	}
+    
+    @Override
+    protected void onDestroy() {
+    	// prevents circular reference memory leak ???
+		if (thumbBall != null) {
+			thumbBall.setDelegate(null);
+		}
+		unbindClientService();
+		unbindServerService();
+    	super.onDestroy();
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.toggle_server_state:
+        	if (serverServiceIsBound) {
+        		unbindServerService();
+        	} else {
+        		bindServerService();	
+        	}
+            return true;
+        case R.id.toggle_client_state:
+        	if (clientServiceIsBound) {
+        		unbindClientService();
+        	} else {
+        		bindClientService();	
+        	}
+            return true;
+        case R.id.set_arduino_mac:
+        	letUserSetArduinoMacAddress();
+        	return true;
+        case R.id.define_server_port:
+        	letUserDefineServerPort();
+        	return true;
+        case R.id.set_server_ip:
+        	letUserSetServerIPAddress();
+        	return true;
+        case R.id.set_server_port:
+        	letUserSetServerPort();
+        	return true;
+        case R.id.server_settings:
+        case R.id.client_settings:
+        case R.id.curr_server_ip:
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+    	MenuItem serverItem = menu.findItem(R.id.toggle_server_state);
+    	serverItem.setTitle(serverServiceIsBound ? R.string.stop_server : R.string.start_server);
+    	serverItem.setEnabled(!clientServiceIsBound);
+    	
+    	MenuItem clientItem = menu.findItem(R.id.toggle_client_state);
+    	clientItem.setTitle(clientServiceIsBound ? R.string.stop_client : R.string.start_client);
+    	clientItem.setEnabled(!serverServiceIsBound);
+    	
+    	MenuItem currServerIPItem = menu.findItem(R.id.curr_server_ip);
+    	currServerIPItem.setTitle("Server IP:  " + NetworkHelper.getLocalIpAddress());
+    	currServerIPItem.setEnabled(false);
+    	
+    	MenuItem arduinoMACItem = menu.findItem(R.id.set_arduino_mac);
+    	arduinoMACItem.setTitle("Arduino:  " + getArduinoMACAddress());
+    	MenuItem defineServerPort = menu.findItem(R.id.define_server_port);
+    	defineServerPort.setTitle("Server Port #:  " + Integer.toString(getDefinedServerPortAddress()));
+    	MenuItem setServerPort = menu.findItem(R.id.set_server_port);
+    	setServerPort.setTitle("Server Port #:  " + Integer.toString(getServerPortAddress()));
+    	MenuItem setServerIP = menu.findItem(R.id.set_server_ip);
+    	setServerIP.setTitle("Server IP:  " + getServerIPAddress());
+    	
+    	return true;
+    }
+    
+    // Methods used in Server App
+    private void letUserSetArduinoMacAddress() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Arduino MAC", 
+    			this.getArduinoMACAddress(), this, ARDUINO_MAC_DIALOG_TAG).show();
+    }
+    
+    private void letUserDefineServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Define Server Port", 
+    			Integer.toString(this.getDefinedServerPortAddress()), this, DEFINE_SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    // Methods used in Client App
+    private void letUserSetServerIPAddress() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Server IP", 
+    			this.getServerIPAddress(), this, SERVER_IP_DIALOG_TAG).show();
+    }
+    
+    private void letUserSetServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Server Port", 
+    			Integer.toString(this.getServerPortAddress()), this, SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    
+    // EditTextDialogInterface
+    public void dialogFinishedWithStatus(boolean positiveStatus, String endingString, int tag) {
+    	if (positiveStatus) {
+    		if (tag == ARDUINO_MAC_DIALOG_TAG) {
+    			this.setPreferenceStringForKey(ARDUINO_MAC_ADDRESS_KEY, endingString);
+    		} else if (tag == DEFINE_SERVER_PORT_DIALOG_TAG) {
+    			this.setPreferenceIntForKey(DEFINE_SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		} else if (tag == SERVER_IP_DIALOG_TAG) {
+    			this.setPreferenceStringForKey(SERVER_IP_ADDRESS_KEY, endingString);
+    		} else if (tag == SERVER_PORT_DIALOG_TAG) {
+    			this.setPreferenceIntForKey(SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		}
+    	}
+    }
+
+    
+    private void bindServerService() {
+    	if (serverService != null) {
+    		unbindServerService();
+    	}
+    	
+    	serverServiceIntent = new Intent(this, ServerService.class);
+    	initServerServiceConnection();
+    	
+    	// Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        bindService(serverServiceIntent, serverConnection, Context.BIND_AUTO_CREATE);
+        serverServiceIsBound = true;
+    } 
+    
+    private void unbindServerService() {
+    	if (serverServiceIsBound) {	
+            // Detach our existing connection.
+            unbindService(serverConnection);
+            serverService = null;
+            serverServiceIntent = null;
+            serverServiceIsBound = false;
+        }
+    }
+    
+    private void bindClientService() {
+    	if (clientServiceIsBound) {
+    		unbindClientService();
+    	}
+    	
+        clientServiceIntent = new Intent(this, ClientService.class);
+    	initClientServiceConnection();
+    	
+    	// Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        bindService(clientServiceIntent, clientConnection, Context.BIND_AUTO_CREATE);
+        clientServiceIsBound = true;
+    }
+    
+    private void unbindClientService() {
+    	if (clientServiceIsBound) {
+    		clientService.closeConnection();
+            // Detach our existing connection.
+            unbindService(clientConnection);
+    		clientService = null;
+            clientServiceIntent = null;
+            clientServiceIsBound = false;
+        }
+    }
+    
+    private Context currentContext() {
+    	return this;
+    }
+    
+    // ThumbBallInterface
+    @Override
+	public void thumbBallPositionChanged(ThumbBall tb) {
+		Log.d("OUTPUT", "X: " + tb.getX() + "  Y: " + tb.getY());
+		xPosTextView.setText(Integer.toString(tb.translatedX()));
+		yPosTextView.setText(Integer.toString(-tb.translatedY()));
+		
+		if (clientService != null && clientService.isConnected()) {
+			Float xFloat = new Float(thumbBall.getX());
+			Float yFloat = new Float(thumbBall.getY());
+			
+			String stringToSend = xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
+			if (!clientService.sendStringToServer(stringToSend)) {
+				Log.d("TouchControl", "ClientService wasn't able to send String");
+			}
+		}
+		
+		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
+	}
+    
+    // ServerServiceInterface
+    @Override
+	public void serverServiceStatusChange(String message, int status) {
+    	Log.d("OUTPUT", message);
+    }
+    
+    @Override
+	public void serverServiceReceivedMessage(ServerService service, String message) {
+    	//Log.d("OUTPUT", "Message:  " + message);
+    	String[] splitArray = message.split(ServerService.SERVER_DELIMITER);
+    	if (splitArray.length >= 2) {
+    		
+    		float x = Float.parseFloat(((String)splitArray[0]));
+    		float y = Float.parseFloat(((String)splitArray[1]));
+    		Log.d("OUTPUT", splitArray[0] + ",  " + x + "        " + splitArray[1] + ",  " + y);
+    		thumbBall.setX(x);
+    		thumbBall.setY(y);
+    		thumbBall.invalidate();
+    		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
+    	}
+    }
+    
+    
+    // ClientServiceInterface
+	public void clientServiceStatusChange(String message, int status) {
+		Log.d("OUTPUT", message);
+	}
+	
+	public String messageToSend() {
+		Float xFloat = new Float(thumbBall.getX());
+		Float yFloat = new Float(thumbBall.getY());
+		return xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
+	}
+	
+	public void clientServiceReceivedResponse(ClientService theClientService, String response) {
+		
+	}
+ 
+    private void messageArduinoIfAppropriate(int x, int y) {
+    	if (shouldKill || shouldEnable) {
+    		// Send unconditional kill or resume message
+    		if (BLUETOOTH_ENABLED) {
+    			if (amarinoService != null) {
+    				amarinoService.sendIntToArduino(shouldKill ? 1 : 0, ARDUINO_SHOULD_KILL_FUNCTION_FLAG);
+    			}
+    			lastChange = System.currentTimeMillis();
+    		}
+			shouldKill = false;
+			shouldEnable = false;
+			thumbBall.zeroThumbBallPosition();
+			return;
+		}
+    	if (System.currentTimeMillis() - lastChange > DELAY ) {
+    		lastChange = System.currentTimeMillis();
+			int[] values = new int[2];
+			values[0] = x;   
+			values[1] = y;
+			
+			if (BLUETOOTH_ENABLED) {
+				if (amarinoService != null) {
+					amarinoService.sendIntArrayToArduino(values, ARDUINO_CONTROL_INPUT_FUNCTION_FLAG);	
+				}			
+			}
+		}
+    }
+    
+    
+    private void initServerServiceConnection() {
+    	serverConnection = new ServiceConnection() {
+    	    public void onServiceConnected(ComponentName className, IBinder service) {
+    	        // This is called when the connection with the service has been
+    	        // established, giving us the service object we can use to
+    	        // interact with the service.  Because we have bound to a explicit
+    	        // service that we know is running in our own process, we can
+    	        // cast its IBinder to a concrete class and directly access it.
+    	        serverService = ((ServerService.ServerBinder)service).getService();
+
+    	        Toast.makeText(currentContext(), R.string.server_service_connected, Toast.LENGTH_SHORT).show();
+    	        makeServerConnection();
+    	    }
+
+    	    public void onServiceDisconnected(ComponentName className) {
+    	        // This is called when the connection with the service has been
+    	        // unexpectedly disconnected -- that is, its process crashed.
+    	        // Because it is running in our same process, we should never
+    	        // see this happen.
+    	        serverService = null;
+    	        Toast.makeText(currentContext(), R.string.server_service_disconnected, Toast.LENGTH_SHORT).show();
+    	    }
+    	};
+    }
+    
+    private void initClientServiceConnection() {
+    	clientConnection = new ServiceConnection() {
+    	    public void onServiceConnected(ComponentName className, IBinder service) {
+    	        // This is called when the connection with the service has been
+    	        // established, giving us the service object we can use to
+    	        // interact with the service.  Because we have bound to a explicit
+    	        // service that we know is running in our own process, we can
+    	        // cast its IBinder to a concrete class and directly access it.
+    	        clientService = ((ClientService.ClientBinder)service).getService();
+    	        Toast.makeText(currentContext(), R.string.client_service_connected, Toast.LENGTH_SHORT).show();
+    	        makeClientConnection();
+    	    }
+
+    	    public void onServiceDisconnected(ComponentName className) {
+    	        // This is called when the connection with the service has been
+    	        // unexpectedly disconnected -- that is, its process crashed.
+    	        // Because it is running in our same process, we should never
+    	        // see this happen.
+    	        clientService = null;
+    	        Toast.makeText(currentContext(), R.string.client_service_disconnected, Toast.LENGTH_SHORT).show();
+    	    }
+    	};
+    }
+    
+    // Preferences changed in Server App
+    private String getArduinoMACAddress() {
+    	return this.getPreferenceStringForKey(ARDUINO_MAC_ADDRESS_KEY, DEFAULT_ARDUINO_MAC_ADDRESS);
+    }
+    
+    private int getDefinedServerPortAddress() {
+    	return this.getPreferenceIntForKey(DEFINE_SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    }
+        
+    // Preferences changed in Client App
+    private String getServerIPAddress() {
+    	return this.getPreferenceStringForKey(SERVER_IP_ADDRESS_KEY, DEFAULT_SERVER_IP_ADDRESS);
+    }
+    
+    private int getServerPortAddress() {
+    	return this.getPreferenceIntForKey(SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    }
+    
+}

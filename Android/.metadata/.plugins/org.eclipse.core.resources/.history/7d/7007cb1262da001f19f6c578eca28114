@@ -1,0 +1,7 @@
+package com.openrobot.common;
+
+public interface ServerSocketServiceInterface {
+	public void serverServiceStatusChange(String message, int status);
+	
+	public void serverServiceReceivedMessage(ServerSocketService service, String message);
+}

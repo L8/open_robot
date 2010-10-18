@@ -1,0 +1,27 @@
+package com.openrobot.common;
+
+import android.content.Intent;
+
+public class AmarinoService {
+
+	
+    private void sendIntToArduino(int message, char methodFlag) {
+    	lastChange = System.currentTimeMillis();
+    	Intent intent = new Intent(AmarinoIntent.ACTION_SEND);
+        intent.putExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS, DEVICE_ADDRESS);
+        intent.putExtra(AmarinoIntent.EXTRA_DATA_TYPE, AmarinoIntent.INT_EXTRA);
+        intent.putExtra(AmarinoIntent.EXTRA_FLAG, methodFlag);
+        intent.putExtra(AmarinoIntent.EXTRA_DATA, message);
+        this.sendBroadcast(intent);
+    }
+    
+    private void sendIntArrayToArduino(int[] message, char methodFlag) {
+    	lastChange = System.currentTimeMillis();
+    	Intent intent = new Intent(AmarinoIntent.ACTION_SEND);
+        intent.putExtra(AmarinoIntent.EXTRA_DEVICE_ADDRESS, DEVICE_ADDRESS);
+        intent.putExtra(AmarinoIntent.EXTRA_DATA_TYPE, AmarinoIntent.INT_ARRAY_EXTRA);
+        intent.putExtra(AmarinoIntent.EXTRA_FLAG, methodFlag);
+        intent.putExtra(AmarinoIntent.EXTRA_DATA, message);
+        this.sendBroadcast(intent);
+    }
+}

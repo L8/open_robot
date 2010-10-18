@@ -1,0 +1,15 @@
+package com.openrobot.touchrobot;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+public class BeRobotActivity extends Activity {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.control_robot_main);
+        
+    }
+	
+}

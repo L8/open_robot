@@ -1,0 +1,35 @@
+package com.openrobot.common;
+
+import android.content.SharedPreferences;
+
+public class PreferenceHelper {
+
+	// ************************************************************************
+    // PREFERENCES UTILITY FUNCTIONS
+    // ************************************************************************
+    
+    private String getPreferenceStringForKey(String key, String defVal) {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+    	return settings.getString(key, defVal);
+    }
+    
+    private void setPreferenceStringForKey(String key, String string) {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(key, string);
+        editor.commit();
+    }
+    
+    private int getPreferenceIntForKey(String key, int defVal) {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+    	return settings.getInt(key, defVal);
+    }
+    
+    private void setPreferenceIntForKey(String key, int theInt) {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt(key, theInt);
+        editor.commit();
+    }
+    
+}
