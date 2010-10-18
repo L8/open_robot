@@ -1,0 +1,287 @@
+package com.openrobot.touchrobot;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+
+import com.openrobot.common.ClientSocketService;
+import com.openrobot.common.ClientSocketServiceInterface;
+import com.openrobot.common.ControlCommunicationConstants;
+import com.openrobot.common.DialogHelper;
+import com.openrobot.common.EditTextDialogInterface;
+import com.openrobot.common.NetworkHelper;
+import com.openrobot.common.PreferenceHelper;
+import com.openrobot.common.ServerService;
+import com.openrobot.common.ThumbBall;
+import com.openrobot.common.ThumbBallListener;
+
+public class ControlRobotActivity extends Activity implements ThumbBallListener, 
+						ClientSocketServiceInterface, EditTextDialogInterface {
+		
+	private static final int SERVER_IP_DIALOG_TAG = 2;
+	private static final int SERVER_PORT_DIALOG_TAG = 3;
+	private static final int DEFINE_SERVER_PORT_DIALOG_TAG = 4;
+	
+	private static final String SERVER_IP_ADDRESS_KEY = "SERVER_IP_ADDRESS";
+	private static final String SERVER_PORT_ADDRESS_KEY = "SERVER_PORT_ADDRESS";
+	private static final String DEFINE_SERVER_PORT_ADDRESS_KEY = "DEFINE_SERVER_PORT_ADDRESS";
+	
+	private static final String DEFAULT_SERVER_IP_ADDRESS = "192.168.1.164";
+	private static final int DEFAULT_SERVER_PORT_ADDRESS = 8080;
+	
+	
+	public final static int DELAY = 150;
+	public final static int CIRCLE_RADIUS = 40;
+	
+	private ThumbBall thumbBall;
+	private TextView xPosTextView;
+	private TextView yPosTextView;
+	private FrameLayout main;
+	private Button killButton;
+	
+	private boolean shouldKill = false;
+	private boolean shouldEnable = false;
+	private boolean killEnabled = false;
+	
+	private ClientSocketService mainClientService;
+	private ClientSocketService controlClientService;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	    setContentView(R.layout.control_robot_main);
+        
+        main = (FrameLayout) findViewById(R.id.main_view);
+        main.setBackgroundColor(Color.CYAN);
+        
+        xPosTextView = (TextView)findViewById(R.id.x_position_textview);
+        yPosTextView = (TextView)findViewById(R.id.y_position_textview);
+        
+        thumbBall = new ThumbBall(this, 
+        		(main.getRight() - main.getLeft()) / 2, 
+        		(main.getBottom() - main.getTop()) / 2 ,
+        		CIRCLE_RADIUS);
+        thumbBall.setDelegate(this);
+        main.addView(thumbBall);
+        
+        this.killButton = (Button)this.findViewById(R.id.kill_button);
+        this.killButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	if (killEnabled) {
+            		shouldEnable = true;
+            		shouldKill = false;
+            		killEnabled = false;
+            		killButton.setText("Stop, please");
+            	} else {
+            		shouldEnable = false;
+            		shouldKill = true;
+            		killEnabled = true;
+            		killButton.setText("OK, Game On.");
+            	}
+            }         
+        });
+    }
+    
+    private void makeMainClientServiceConnection() {
+		this.destroyMainClientServiceConnection();
+		mainClientService = new ClientSocketService(this);
+		mainClientService.makeConnection(getServerIPAddress(), getServerPortAddress(), false);
+	}
+	
+	private void destroyMainClientServiceConnection() {
+		if (mainClientService != null) {
+			mainClientService.disconnect();
+			mainClientService = null;
+		}	
+	}
+	
+	 private void makeControlClientServiceConnection(int port) {
+			this.destroyControlClientServiceConnection();
+			controlClientService = new ClientSocketService(this);
+			controlClientService.makeConnection(getServerIPAddress(), port, false);
+		}
+		
+		private void destroyControlClientServiceConnection() {
+			if (controlClientService != null) {
+				controlClientService.disconnect();
+				controlClientService = null;
+			}	
+		}
+    
+    @Override
+    public void onStart() {
+    	super.onStart();
+    	thumbBall.setX(ThumbBall.FRAME_WIDTH / 2);
+    	thumbBall.setY(ThumbBall.FRAME_HEIGHT / 2);
+    	thumbBall.invalidate();
+    }
+    
+    @Override
+	protected void onStop() {
+		super.onStop();
+	}
+    
+    @Override
+    protected void onDestroy() {
+    	// prevents circular reference memory leak ???
+		if (thumbBall != null) {
+			thumbBall.setDelegate(null);
+		}
+		destroyMainClientServiceConnection();
+		destroyControlClientServiceConnection();
+    	super.onDestroy();
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.toggle_client_state:
+        	if (this.mainClientService != null) {
+        		destroyMainClientServiceConnection();
+        		destroyControlClientServiceConnection();
+        	} else {
+        		makeMainClientServiceConnection();
+        	}
+            return true;
+        case R.id.define_server_port:
+        	letUserDefineServerPort();
+        	return true;
+        case R.id.set_server_ip:
+        	letUserSetServerIPAddress();
+        	return true;
+        case R.id.set_server_port:
+        	letUserSetServerPort();
+        	return true;
+        case R.id.server_settings:
+        case R.id.client_settings:
+        case R.id.curr_server_ip:
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+    
+    	MenuItem clientItem = menu.findItem(R.id.toggle_client_state);
+    	clientItem.setTitle(mainClientService != null ? R.string.stop_client : R.string.start_client);
+    	clientItem.setEnabled(true);
+    	
+    	MenuItem currServerIPItem = menu.findItem(R.id.curr_server_ip);
+    	currServerIPItem.setTitle("Server IP:  " + NetworkHelper.getLocalIpAddress());
+    	currServerIPItem.setEnabled(false);
+    	MenuItem defineServerPort = menu.findItem(R.id.define_server_port);
+    	defineServerPort.setTitle("Server Port #:  " + Integer.toString(getDefinedServerPortAddress()));
+    	MenuItem setServerPort = menu.findItem(R.id.set_server_port);
+    	setServerPort.setTitle("Server Port #:  " + Integer.toString(getServerPortAddress()));
+    	MenuItem setServerIP = menu.findItem(R.id.set_server_ip);
+    	setServerIP.setTitle("Server IP:  " + getServerIPAddress());
+    	
+    	return true;
+    }
+    
+    // Methods used in Server App
+    
+    private void letUserDefineServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Define Server Port", 
+    			Integer.toString(this.getDefinedServerPortAddress()), this, DEFINE_SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    // Methods used in Client App
+    private void letUserSetServerIPAddress() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Server IP", 
+    			this.getServerIPAddress(), this, SERVER_IP_DIALOG_TAG).show();
+    }
+    
+    private void letUserSetServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Server Port", 
+    			Integer.toString(this.getServerPortAddress()), this, SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    
+    // EditTextDialogInterface
+    public void dialogFinishedWithStatus(boolean positiveStatus, String endingString, int tag) {
+    	if (positiveStatus) {
+    		if (tag == DEFINE_SERVER_PORT_DIALOG_TAG) {
+    			PreferenceHelper.setPreferenceIntForKey(this, DEFINE_SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		} else if (tag == SERVER_IP_DIALOG_TAG) {
+    			PreferenceHelper.setPreferenceStringForKey(this, SERVER_IP_ADDRESS_KEY, endingString);
+    		} else if (tag == SERVER_PORT_DIALOG_TAG) {
+    			PreferenceHelper.setPreferenceIntForKey(this, SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		}
+    	}
+    }
+    
+    private Context currentContext() {
+    	return this;
+    }
+    
+    // ThumbBallInterface
+    @Override
+	public void thumbBallPositionChanged(ThumbBall tb) {
+		Log.d("OUTPUT", "X: " + tb.getX() + "  Y: " + tb.getY());
+		xPosTextView.setText(Integer.toString(tb.translatedX()));
+		yPosTextView.setText(Integer.toString(-tb.translatedY()));
+		
+		if (controlClientService != null && controlClientService.isConnected()) {
+			Float xFloat = new Float(thumbBall.getX());
+			Float yFloat = new Float(thumbBall.getY());
+			
+			String stringToSend = xFloat.toString() + ControlCommunicationConstants.DELIMITER + yFloat.toString();
+			if (!mainClientService.sendStringToServer(stringToSend)) {
+				Log.d("TouchControl", "ClientService wasn't able to send String");
+			}
+		}
+	}
+   
+    
+    // ClientSocketServiceInterface
+    public void clientServiceStatusChange(ClientSocketService theService, String message, int status) {
+    	Log.d("OUTPUT", message);
+    }
+	
+	public String messageToSend() {
+		Float xFloat = new Float(thumbBall.getX());
+		Float yFloat = new Float(thumbBall.getY());
+		return xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
+	}
+	
+	public void clientServiceReceivedResponse(ClientSocketService theClientService, String response) {
+		
+	}
+    
+    // Preferences changed in Server App
+    private int getDefinedServerPortAddress() {
+    	return PreferenceHelper.getPreferenceIntForKey(this, DEFINE_SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    }
+        
+    // Preferences changed in Client App
+    private String getServerIPAddress() {
+    	return PreferenceHelper.getPreferenceStringForKey(this, SERVER_IP_ADDRESS_KEY, DEFAULT_SERVER_IP_ADDRESS);
+    }
+    
+    private int getServerPortAddress() {
+    	return PreferenceHelper.getPreferenceIntForKey(this, SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    }
+    
+}

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.openrobot.common.AmarinoService;
 import com.openrobot.common.ClientService;
 import com.openrobot.common.ClientServiceInterface;
+import com.openrobot.common.ControlCommunicationConstants;
 import com.openrobot.common.DialogHelper;
 import com.openrobot.common.EditTextDialogInterface;
 import com.openrobot.common.NetworkHelper;
@@ -276,10 +277,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     	}
     }
     
-    private Context currentContext() {
-    	return this;
-    }
-    
+
     // ThumbBallInterface
     @Override
 	public void thumbBallPositionChanged(ThumbBall tb) {
@@ -298,17 +296,37 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     
     @Override
 	public String serverServiceReceivedMessage(ServerSocketService service, String message) {
-    	//Log.d("OUTPUT", "Message:  " + message);
-    	String[] splitArray = message.split(ServerService.SERVER_DELIMITER);
-    	if (splitArray.length >= 2) {
-    		
-    		float x = Float.parseFloat(((String)splitArray[0]));
-    		float y = Float.parseFloat(((String)splitArray[1]));
-    		Log.d("OUTPUT", splitArray[0] + ",  " + x + "        " + splitArray[1] + ",  " + y);
-    		thumbBall.setX(x);
-    		thumbBall.setY(y);
-    		thumbBall.invalidate();
-    		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
+    	
+    	String[] splitArray = message.split(ControlCommunicationConstants.DELIMITER);
+    	
+    	if (service == mainServerService) {
+    		Log.d("OUTPUT", "Message:  " + message);
+    		String response = null;
+    		if (splitArray.length >= 1) {
+    			if (splitArray[0].equalsIgnoreCase(ControlCommunicationConstants.REQUEST_TYPE_CONTROL_CONNECTION)) {
+    				
+    				if (controlServerService != null) { // already bound
+    					response = ControlCommunicationConstants.REQUEST_STATUS_FAILURE;
+    				} else {
+    					response = ControlCommunicationConstants.REQUEST_STATUS_SUCCESS + ControlCommunicationConstants.DELIMITER + ControlCommunicationConstants.RESPONSE_TYPE_CONTROL_CONNECTION + ControlCommunicationConstants.DELIMITER + BeRobotActivity.DEFAULT_CONTROL_SERVER_PORT_ADDRESS;
+    					return response;
+    				}
+    			}
+    		}
+    		return response; 		
+    	} else if (service == controlServerService) {
+    		//Log.d("OUTPUT", "Message:  " + message);
+        	if (splitArray.length >= 2) {
+        		
+        		float x = Float.parseFloat(((String)splitArray[0]));
+        		float y = Float.parseFloat(((String)splitArray[1]));
+        		Log.d("OUTPUT", splitArray[0] + ",  " + x + "        " + splitArray[1] + ",  " + y);
+        		thumbBall.setX(x);
+        		thumbBall.setY(y);
+        		thumbBall.invalidate();
+        		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
+        	}
+        	return null;
     	}
     	return null;
     }

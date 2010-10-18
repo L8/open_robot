@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="20" version="2.0">
+<workbench progressCount="21" version="2.0">
 <workbenchAdvisor/>
 <window height="768" maximized="true" width="1024" x="0" y="28">
 <fastViewData fastViewLocation="1024"/>
@@ -21,6 +21,7 @@
 <coolItem id="group.nav" itemType="typeGroupMarker"/>
 <coolItem id="org.eclipse.ui.workbench.navigate" itemType="typeToolBarContribution" x="152" y="22"/>
 <coolItem id="group.editor" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.jdt.ui.ClassFileEditor" itemType="typeToolBarContribution" x="-1" y="-1"/>
 <coolItem id="org.eclipse.ui.DefaultTextEditor" itemType="typePlaceholder" x="-1" y="-1"/>
 <coolItem id="org.eclipse.ui.browser.editor" itemType="typePlaceholder" x="-1" y="-1"/>
 <coolItem id="org.eclipse.jdt.ui.CompilationUnitEditor" itemType="typeToolBarContribution" x="-1" y="-1"/>
@@ -41,40 +42,102 @@
 <part id="5"/>
 <part id="6"/>
 <part id="7"/>
+<part id="8"/>
+<part id="9"/>
+<part id="10"/>
+<part id="11"/>
+<part id="12"/>
+<part id="13"/>
+<part id="14"/>
+<part id="15"/>
+<part id="16"/>
+<part id="17"/>
+<part id="18"/>
+<part id="19"/>
+<part id="20"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ServerService.java" partName="ServerService.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ServerService.java" title="ServerService.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ServerService.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ServerService.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1718" selectionTopPixel="295"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="DialogHelper.java" partName="DialogHelper.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/DialogHelper.java" title="DialogHelper.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/DialogHelper.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/DialogHelper.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1880" selectionTopPixel="399"/>
-</editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientService.java" partName="ClientService.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ClientService.java" title="ClientService.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ClientService.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ClientService.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4470" selectionTopPixel="2018"/>
+<editorState selectionHorizontalPixel="0" selectionLength="6316" selectionOffset="509" selectionTopPixel="2589"/>
 </editor>
-<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="TouchControl.java" partName="TouchControl.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/TouchControl/src/com/robot/open/TouchControl.java" title="TouchControl.java" tooltip="TouchControl/src/com/robot/open/TouchControl.java" workbook="DefaultEditorWorkbook">
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="TouchControl.java" partName="TouchControl.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/TouchControl/src/com/robot/open/TouchControl.java" title="TouchControl.java" tooltip="TouchControl/src/com/robot/open/TouchControl.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/TouchControl/src/com/robot/open/TouchControl.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="25" selectionTopPixel="255"/>
+<editorState selectionHorizontalPixel="36" selectionLength="18678" selectionOffset="1169" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ThumbBall.java" partName="ThumbBall.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ThumbBall.java" title="ThumbBall.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ThumbBall.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ThumbBall.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="5472" selectionTopPixel="2859"/>
+<editor id="com.android.ide.eclipse.editors.manifest.ManifestEditor" name="AndroidManifest.xml" partName="OpenRobotLibrary Manifest" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/AndroidManifest.xml" title="OpenRobotLibrary Manifest" tooltip="OpenRobotLibrary/AndroidManifest.xml" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/AndroidManifest.xml"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JavaPlayGround.java" partName="JavaPlayGround.java" path="/Users/vespa/Code/Java/JavaPlayGround/src/JavaPlayGround.java" title="JavaPlayGround.java" tooltip="JavaPlayGround/src/JavaPlayGround.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/JavaPlayGround/src/JavaPlayGround.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="74" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SleepyProducerConsumer.java" partName="SleepyProducerConsumer.java" path="/Users/vespa/Code/Java/JavaPlayGround/src/SleepyProducerConsumer.java" title="SleepyProducerConsumer.java" tooltip="JavaPlayGround/src/SleepyProducerConsumer.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/JavaPlayGround/src/SleepyProducerConsumer.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="287" selectionOffset="1990" selectionTopPixel="990"/>
+</editor>
+<editor id="com.android.ide.eclipse.editors.layout.LayoutEditor" name="main.xml" partName="main.xml" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/TouchRobot/res/layout/main.xml" title="main.xml" tooltip="TouchRobot/res/layout/main.xml" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/TouchRobot/res/layout/main.xml"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ActivityChooser.java" partName="ActivityChooser.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/TouchRobot/src/com/openrobot/touchrobot/ActivityChooser.java" title="ActivityChooser.java" tooltip="TouchRobot/src/com/openrobot/touchrobot/ActivityChooser.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/TouchRobot/src/com/openrobot/touchrobot/ActivityChooser.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="350" selectionTopPixel="69"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="BeRobotActivity.java" partName="BeRobotActivity.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/TouchRobot/src/com/openrobot/touchrobot/BeRobotActivity.java" title="BeRobotActivity.java" tooltip="TouchRobot/src/com/openrobot/touchrobot/BeRobotActivity.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/TouchRobot/src/com/openrobot/touchrobot/BeRobotActivity.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="40" selectionOffset="10745" selectionTopPixel="4363"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ControlRobotActivity.java" partName="ControlRobotActivity.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/TouchRobot/src/com/openrobot/touchrobot/ControlRobotActivity.java" title="ControlRobotActivity.java" tooltip="TouchRobot/src/com/openrobot/touchrobot/ControlRobotActivity.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/TouchRobot/src/com/openrobot/touchrobot/ControlRobotActivity.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4091" selectionTopPixel="1571"/>
+</editor>
+<editor id="com.android.ide.eclipse.editors.layout.LayoutEditor" name="main.xml" partName="main.xml" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/TouchControl/res/layout/main.xml" title="main.xml" tooltip="TouchControl/res/layout/main.xml" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/TouchControl/res/layout/main.xml"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="AmarinoService.java" partName="AmarinoService.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/AmarinoService.java" title="AmarinoService.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/AmarinoService.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/AmarinoService.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1057" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="PreferenceHelper.java" partName="PreferenceHelper.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/PreferenceHelper.java" title="PreferenceHelper.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/PreferenceHelper.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/PreferenceHelper.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1128" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="AmarinoService.java" partName="AmarinoService.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/AmarinoService.java" title="AmarinoService.java" tooltip="TouchRobot/OpenRobotLibrary_src/com/openrobot/common/AmarinoService.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/TouchRobot/OpenRobotLibrary_src/com/openrobot/common/AmarinoService.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="510" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ServerService.java" partName="ServerService.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ServerService.java" title="ServerService.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ServerService.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ServerService.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="51" selectionOffset="982" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ServerSocketService.java" partName="ServerSocketService.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ServerSocketService.java" title="ServerSocketService.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ServerSocketService.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ServerSocketService.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="27" selectionOffset="1390" selectionTopPixel="422"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ServerSocketServiceInterface.java" partName="ServerSocketServiceInterface.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ServerSocketServiceInterface.java" title="ServerSocketServiceInterface.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ServerSocketServiceInterface.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ServerSocketServiceInterface.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="192" selectionTopPixel="0"/>
+</editor>
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientSocketService.java" partName="ClientSocketService.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ClientSocketService.java" title="ClientSocketService.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ClientSocketService.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ClientSocketService.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3464" selectionTopPixel="1376"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientSocketServiceInterface.java" partName="ClientSocketServiceInterface.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ClientSocketServiceInterface.java" title="ClientSocketServiceInterface.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ClientSocketServiceInterface.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ClientSocketServiceInterface.java"/>
+<editorState selectionHorizontalPixel="19" selectionLength="234" selectionOffset="82" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientServiceInterface.java" partName="ClientServiceInterface.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ClientServiceInterface.java" title="ClientServiceInterface.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ClientServiceInterface.java" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ClientServiceInterface.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="76" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="196" selectionOffset="76" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EditTextDialogInterface.java" partName="EditTextDialogInterface.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/EditTextDialogInterface.java" title="EditTextDialogInterface.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/EditTextDialogInterface.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/EditTextDialogInterface.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="167" selectionTopPixel="0"/>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ControlCommunicationConstants.java" partName="ControlCommunicationConstants.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ControlCommunicationConstants.java" title="ControlCommunicationConstants.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ControlCommunicationConstants.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ControlCommunicationConstants.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="120" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ThumbBallListener.java" partName="ThumbBallListener.java" path="/Users/vespa/Code/PhiNominal/OpenRobotWorking/Android/OpenRobotLibrary/src/com/openrobot/common/ThumbBallListener.java" title="ThumbBallListener.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ThumbBallListener.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/OpenRobotLibrary/src/com/openrobot/common/ThumbBallListener.java"/>
+<editor id="org.eclipse.jdt.ui.ClassFileEditor" name="InputStreamReader.class" partName="InputStreamReader.class" title="InputStreamReader.class" tooltip="java.io.InputStreamReader" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.io(InputStreamReader.class"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
 </editor>
 </editors>
@@ -88,11 +151,9 @@
 <view id="org.eclipse.ui.views.ProblemView" partName="Problems">
 <viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.severityAndDescriptionField" categoryGroup="org.eclipse.ui.ide.severity" markerContentGenerator="org.eclipse.ui.ide.problemsGenerator" partName="Problems">
 <expanded>
-<category IMemento.internal.id="Warnings"/>
-<category IMemento.internal.id="Errors"/>
-<category IMemento.internal.id="Errors (3 items)"/>
+<category IMemento.internal.id="Warnings (3 items)"/>
 </expanded>
-<columnWidths org.eclipse.ui.ide.locationField="84" org.eclipse.ui.ide.markerType="114" org.eclipse.ui.ide.pathField="144" org.eclipse.ui.ide.resourceField="114" org.eclipse.ui.ide.severityAndDescriptionField="440"/>
+<columnWidths org.eclipse.ui.ide.locationField="0" org.eclipse.ui.ide.markerType="0" org.eclipse.ui.ide.pathField="0" org.eclipse.ui.ide.resourceField="0" org.eclipse.ui.ide.severityAndDescriptionField="0"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.severityAndDescriptionField"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.resourceField"/>
 <visible IMemento.internal.id="org.eclipse.ui.ide.pathField"/>
@@ -160,7 +221,7 @@
 <view id="org.eclipse.jdt.ui.SourceView" partName="Declaration"/>
 <view id="org.eclipse.jdt.ui.JavadocView" partName="Javadoc"/>
 </views>
-<perspectives activePart="com.android.ide.eclipse.ddms.views.LogCatView" activePerspective="org.eclipse.debug.ui.DebugPerspective">
+<perspectives activePart="org.eclipse.debug.ui.DebugView" activePerspective="org.eclipse.debug.ui.DebugPerspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.eclipse.jdt.internal.ui.JavaPerspectiveFactory" id="org.eclipse.jdt.ui.JavaPerspective" label="Java"/>
 <alwaysOnActionSet id="org.eclipse.mylyn.context.ui.actionSet"/>
@@ -250,7 +311,7 @@
 <page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
 </folder>
 </info>
-<info part="org.eclipse.ui.editorss" ratio="0.25" ratioLeft="254" ratioRight="762" relationship="2" relative="left"/>
+<info part="org.eclipse.ui.editorss" ratio="0.22931442" ratioLeft="291" ratioRight="978" relationship="2" relative="left"/>
 <info folder="true" part="bottom" ratio="0.74963397" ratioLeft="512" ratioRight="171" relationship="4" relative="org.eclipse.ui.editorss">
 <folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
 <page content="org.eclipse.ui.views.ProblemView" label="Problems"/>
@@ -357,7 +418,7 @@
 <page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.debug.internal.ui.ConsoleFolderView" ratio="0.63848394" ratioLeft="438" ratioRight="248" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">
+<info folder="true" part="org.eclipse.debug.internal.ui.ConsoleFolderView" ratio="0.6078717" ratioLeft="417" ratioRight="269" relationship="4" relative="org.eclipse.debug.internal.ui.NavigatorFolderView">
 <folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
 <page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.ui.views.TaskList" label="Tasks"/>
@@ -408,155 +469,139 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/DialogHelper.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/ThumbBall.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/TouchControl/src/com/robot/open/TouchControl.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/ServerService.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/ClientService.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.ui.DefaultTextEditor" path="/OpenRobotLibrary/src/com/openrobot/common/ThumbBallListener"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/ThumbBallListener.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/ServerServiceInterface.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/ClientServiceInterface.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/EditTextDialogInterface.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/EditStringDialog.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.android.ide.eclipse.editors.manifest.ManifestEditor" path="/OpenRobotLibrary/AndroidManifest.xml"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.android.ide.eclipse.editors.manifest.ManifestEditor" path="/TouchControl/AndroidManifest.xml"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/OpenRobotLibrary/src/com/openrobot/common/ClientSocketService.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/TouchRobot/src/com/openrobot/touchrobot/ControlRobotActivity.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/TouchRobot/OpenRobotLibrary_src/com/openrobot/common/ClientSocketService.java"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.io(BufferedReader.class"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.io(InputStreamReader.class"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.lang(Math.class"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.nio(Buffer.class"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.nio(CharBuffer.class"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.lang(Object.class"/>
+<editor factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.nio(ByteBuffer.class"/>
 </editors>
-<item historyLabel="ServerService.java" index="3">
-<position info="not_deleted" x="1676" y="0"/>
+<item historyLabel="ControlRobotActivity.java" index="1">
+<position info="not_deleted" x="2990" y="0"/>
 </item>
-<item historyLabel="DialogHelper.java" index="0">
-<position info="not_deleted" x="355" y="0"/>
+<item historyLabel="ControlRobotActivity.java" index="1">
+<position info="not_deleted" x="4508" y="0"/>
 </item>
-<item historyLabel="ClientService.java" index="4">
-<position info="not_deleted" x="811" y="0"/>
+<item historyLabel="ClientSocketService.java" index="0">
+<position info="not_deleted" x="3464" y="0"/>
 </item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="25" y="0"/>
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="3152" y="0"/>
 </item>
-<item historyLabel="ThumbBall.java" index="1">
-<position info="not_deleted" x="5472" y="0"/>
+<item historyLabel="ControlRobotActivity.java" index="1">
+<position info="not_deleted" x="4091" y="0"/>
 </item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="25" y="0"/>
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="3152" y="0"/>
 </item>
-<item historyLabel="ThumbBall.java" index="1">
-<position info="not_deleted" x="5472" y="0"/>
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="1622" y="0"/>
 </item>
-<item historyLabel="ThumbBallListener" index="5">
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="3152" y="0"/>
+</item>
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="3219" y="0"/>
+</item>
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="2823" y="0"/>
+</item>
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="3357" y="0"/>
+</item>
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="618" y="0"/>
+</item>
+<item historyLabel="ClientSocketService.java" index="2">
+<position info="not_deleted" x="3357" y="0"/>
+</item>
+<item historyLabel="BufferedReader.class" index="3">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="ThumbBall.java" index="1">
-<position info="not_deleted" x="5472" y="0"/>
-</item>
-<item historyLabel="ThumbBallListener.java" index="6">
-<position info="not_deleted" x="115" y="0"/>
-</item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="708" y="0"/>
-</item>
-<item historyLabel="ServerServiceInterface.java" index="7">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="ServerService.java" index="3">
-<position info="not_deleted" x="6616" y="0"/>
-</item>
-<item historyLabel="ServerServiceInterface.java" index="7">
-<position info="not_deleted" x="225" y="0"/>
-</item>
-<item historyLabel="ServerService.java" index="3">
-<position info="not_deleted" x="6616" y="0"/>
-</item>
-<item historyLabel="ThumbBallListener.java" index="6">
-<position info="not_deleted" x="115" y="0"/>
-</item>
-<item historyLabel="ServerService.java" index="3">
-<position info="not_deleted" x="6616" y="0"/>
-</item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="708" y="0"/>
-</item>
-<item historyLabel="ClientServiceInterface.java" index="8">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="ClientService.java" index="4">
-<position info="not_deleted" x="5021" y="0"/>
-</item>
-<item historyLabel="ClientServiceInterface.java" index="8">
-<position info="not_deleted" x="76" y="0"/>
-</item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="708" y="0"/>
-</item>
-<item historyLabel="EditTextDialogInterface.java" index="9">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="EditStringDialog.java" index="10">
+<item historyLabel="InputStreamReader.class" index="4">
 <position/>
 </item>
-<item historyLabel="EditTextDialogInterface.java" index="9">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="708" y="0"/>
-</item>
-<item historyLabel="EditTextDialogInterface.java" index="9">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="DialogHelper.java" index="0">
-<position info="not_deleted" x="1880" y="0"/>
-</item>
-<item historyLabel="EditStringDialog.java" index="10">
+<item historyLabel="InputStreamReader.class" index="4">
 <position/>
 </item>
-<item historyLabel="EditTextDialogInterface.java" index="9">
-<position info="not_deleted" x="167" y="0"/>
+<item historyLabel="Math.class" index="5">
+<position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="EditStringDialog.java" index="10">
+<item historyLabel="InputStreamReader.class" index="4">
 <position/>
 </item>
-<item historyLabel="EditTextDialogInterface.java" index="9">
-<position info="not_deleted" x="167" y="0"/>
+<item historyLabel="Buffer.class" index="6">
+<position/>
 </item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="536" y="0"/>
+<item historyLabel="InputStreamReader.class" index="4">
+<position/>
 </item>
-<item historyLabel="ClientService.java" index="4">
-<position info="not_deleted" x="4470" y="0"/>
+<item historyLabel="CharBuffer.class" index="7">
+<position/>
 </item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="536" y="0"/>
+<item historyLabel="CharBuffer.class" index="7">
+<position/>
 </item>
-<item historyLabel="ServerService.java" index="3">
-<position info="not_deleted" x="1718" y="0"/>
+<item historyLabel="Buffer.class" index="6">
+<position/>
 </item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="536" y="0"/>
-</item>
-<item historyLabel="OpenRobotLibrary Manifest" index="11"/>
-<item historyLabel="TouchControl Manifest" index="12"/>
-<item historyLabel="OpenRobotLibrary Manifest" index="11"/>
-<item historyLabel="TouchControl Manifest" index="12"/>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="536" y="0"/>
-</item>
-<item historyLabel="EditStringDialog.java" index="10">
+<item historyLabel="Object.class" index="8">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="18072" y="0"/>
+<item historyLabel="Buffer.class" index="6">
+<position/>
 </item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="18072" y="0"/>
-</item>
-<item historyLabel="ThumbBallListener.java" index="6">
+<item historyLabel="CharBuffer.class" index="7">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="25" y="0"/>
+<item historyLabel="CharBuffer.class" index="7">
+<position info="not_deleted" x="0" y="0"/>
 </item>
-<item active="true" historyLabel="TouchControl.java" index="2">
-<position info="not_deleted" x="25" y="0"/>
+<item historyLabel="InputStreamReader.class" index="4">
+<position/>
+</item>
+<item historyLabel="ByteBuffer.class" index="9">
+<position/>
+</item>
+<item historyLabel="InputStreamReader.class" index="4">
+<position/>
+</item>
+<item historyLabel="Buffer.class" index="6">
+<position/>
+</item>
+<item historyLabel="InputStreamReader.class" index="4">
+<position/>
+</item>
+<item historyLabel="Buffer.class" index="6">
+<position/>
+</item>
+<item historyLabel="InputStreamReader.class" index="4">
+<position/>
+</item>
+<item historyLabel="Buffer.class" index="6">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="InputStreamReader.class" index="4">
+<position/>
+</item>
+<item historyLabel="Buffer.class" index="6">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="InputStreamReader.class" index="4">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="ByteBuffer.class" index="9">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="InputStreamReader.class" index="4">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item active="true" historyLabel="ClientSocketService.java" index="0">
+<position info="not_deleted" x="3464" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -564,13 +609,6 @@
 <workbenchWindowAdvisor/>
 <actionBarAdvisor/>
 <trimLayout>
-<trimArea IMemento.internal.id="131072">
-<trimItem IMemento.internal.id="org.eclipse.ui.editorss"/>
-<trimItem IMemento.internal.id="org.eclipse.debug.internal.ui.ConsoleFolderView"/>
-<trimItem IMemento.internal.id="org.eclipse.debug.internal.ui.NavigatorFolderView"/>
-<trimItem IMemento.internal.id="org.eclipse.debug.internal.ui.ToolsFolderView"/>
-<trimItem IMemento.internal.id="org.eclipse.debug.internal.ui.OutlineFolderView"/>
-</trimArea>
 <trimArea IMemento.internal.id="128">
 <trimItem IMemento.internal.id="org.eclipse.ui.internal.WorkbenchWindow.topBar"/>
 </trimArea>
@@ -582,35 +620,32 @@
 </trimLayout>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ThumbBallListener.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ThumbBallListener.java">
-<persistable path="/OpenRobotLibrary/src/com/openrobot/common/ThumbBallListener.java"/>
+<file factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" name="ByteBuffer.class" tooltip="java.nio.ByteBuffer">
+<persistable org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.nio(ByteBuffer.class"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.android.ide.eclipse.editors.manifest.ManifestEditor" name="AndroidManifest.xml" tooltip="TouchControl/AndroidManifest.xml">
-<persistable path="/TouchControl/AndroidManifest.xml"/>
+<file factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" name="CharBuffer.class" tooltip="java.nio.CharBuffer">
+<persistable org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.nio(CharBuffer.class"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="com.android.ide.eclipse.editors.manifest.ManifestEditor" name="AndroidManifest.xml" tooltip="OpenRobotLibrary/AndroidManifest.xml">
-<persistable path="/OpenRobotLibrary/AndroidManifest.xml"/>
+<file factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" name="InputStreamReader.class" tooltip="java.io.InputStreamReader">
+<persistable org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.io(InputStreamReader.class"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EditTextDialogInterface.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/EditTextDialogInterface.java">
-<persistable path="/OpenRobotLibrary/src/com/openrobot/common/EditTextDialogInterface.java"/>
+<file factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" id="org.eclipse.jdt.ui.ClassFileEditor" name="BufferedReader.class" tooltip="java.io.BufferedReader">
+<persistable org.eclipse.jdt.ui.ClassFileIdentifier="=OpenRobotLibrary/\/Users\/vespa\/Code\/Libraries\/android-sdk-mac_86\/platforms\/android-8\/android.jar&lt;java.io(BufferedReader.class"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientSocketService.java" tooltip="TouchRobot/OpenRobotLibrary_src/com/openrobot/common/ClientSocketService.java">
+<persistable path="/TouchRobot/OpenRobotLibrary_src/com/openrobot/common/ClientSocketService.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ControlCommunicationConstants.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ControlCommunicationConstants.java">
+<persistable path="/OpenRobotLibrary/src/com/openrobot/common/ControlCommunicationConstants.java"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientServiceInterface.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ClientServiceInterface.java">
 <persistable path="/OpenRobotLibrary/src/com/openrobot/common/ClientServiceInterface.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ServerServiceInterface.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ServerServiceInterface.java">
-<persistable path="/OpenRobotLibrary/src/com/openrobot/common/ServerServiceInterface.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientSocketServiceInterface.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ClientSocketServiceInterface.java">
+<persistable path="/OpenRobotLibrary/src/com/openrobot/common/ClientSocketServiceInterface.java"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ThumbBall.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ThumbBall.java">
-<persistable path="/OpenRobotLibrary/src/com/openrobot/common/ThumbBall.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="TouchControl.java" tooltip="TouchControl/src/com/robot/open/TouchControl.java">
-<persistable path="/TouchControl/src/com/robot/open/TouchControl.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientService.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ClientService.java">
-<persistable path="/OpenRobotLibrary/src/com/openrobot/common/ClientService.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="DialogHelper.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/DialogHelper.java">
-<persistable path="/OpenRobotLibrary/src/com/openrobot/common/DialogHelper.java"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ClientSocketService.java" tooltip="OpenRobotLibrary/src/com/openrobot/common/ClientSocketService.java">
+<persistable path="/OpenRobotLibrary/src/com/openrobot/common/ClientSocketService.java"/>
 </file>
 </mruList>
 </workbench>

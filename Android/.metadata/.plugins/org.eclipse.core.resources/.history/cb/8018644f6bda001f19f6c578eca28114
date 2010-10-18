@@ -1,0 +1,6 @@
+package com.openrobot.common;
+
+public class ControlCommunicationConstants {
+	public static final String REQUEST_TYPE_CONTROL_CONNECTION = "ControlConnectionRequest";
+	public static final String REQUEST_TYPE_VIDEO_CONNECTION = "VideoConnectionRequest";
+}

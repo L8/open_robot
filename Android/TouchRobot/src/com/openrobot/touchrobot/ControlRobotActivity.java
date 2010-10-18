@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.openrobot.common.ClientSocketService;
 import com.openrobot.common.ClientSocketServiceInterface;
+import com.openrobot.common.ControlCommunicationConstants;
 import com.openrobot.common.DialogHelper;
 import com.openrobot.common.EditTextDialogInterface;
 import com.openrobot.common.NetworkHelper;
@@ -53,7 +54,8 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	private boolean killEnabled = false;
 	
 	private ClientSocketService mainClientService;
-
+	private ClientSocketService controlClientService;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -76,6 +78,8 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
         this.killButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+            	makeControlConnectionRequest();
+            	/*
             	if (killEnabled) {
             		shouldEnable = true;
             		shouldKill = false;
@@ -87,6 +91,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
             		killEnabled = true;
             		killButton.setText("OK, Game On.");
             	}
+            	*/
             }         
         });
     }
@@ -94,7 +99,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
     private void makeMainClientServiceConnection() {
 		this.destroyMainClientServiceConnection();
 		mainClientService = new ClientSocketService(this);
-		mainClientService.makeConnection(getServerIPAddress(), getServerPortAddress(), false);
+		mainClientService.makeConnection(getServerIPAddress(), getServerPortAddress(), true);
 	}
 	
 	private void destroyMainClientServiceConnection() {
@@ -103,7 +108,29 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 			mainClientService = null;
 		}	
 	}
+	
+	 private void makeControlClientServiceConnection(int port) {
+			this.destroyControlClientServiceConnection();
+			controlClientService = new ClientSocketService(this);
+			controlClientService.makeConnection(getServerIPAddress(), port, false);
+		}
+		
+	private void destroyControlClientServiceConnection() {
+		if (controlClientService != null) {
+			controlClientService.disconnect();
+			controlClientService = null;
+		}	
+	}
     
+	private void makeControlConnectionRequest() {
+		if (mainClientService != null && mainClientService.isConnected()) {
+			String stringToSend = ControlCommunicationConstants.REQUEST_TYPE_CONTROL_CONNECTION;
+			if (!mainClientService.sendStringToServer(stringToSend)) {
+				Log.d("TouchControl", "ControlClientService wasn't able to send String");
+			}
+		}
+	}
+	
     @Override
     public void onStart() {
     	super.onStart();
@@ -124,6 +151,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 			thumbBall.setDelegate(null);
 		}
 		destroyMainClientServiceConnection();
+		destroyControlClientServiceConnection();
     	super.onDestroy();
     }
     
@@ -142,6 +170,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
         case R.id.toggle_client_state:
         	if (this.mainClientService != null) {
         		destroyMainClientServiceConnection();
+        		destroyControlClientServiceConnection();
         	} else {
         		makeMainClientServiceConnection();
         	}
@@ -226,13 +255,13 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 		xPosTextView.setText(Integer.toString(tb.translatedX()));
 		yPosTextView.setText(Integer.toString(-tb.translatedY()));
 		
-		if (mainClientService != null && mainClientService.isConnected()) {
+		if (controlClientService != null && controlClientService.isConnected()) {
 			Float xFloat = new Float(thumbBall.getX());
 			Float yFloat = new Float(thumbBall.getY());
 			
-			String stringToSend = xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
-			if (!mainClientService.sendStringToServer(stringToSend)) {
-				Log.d("TouchControl", "ClientService wasn't able to send String");
+			String stringToSend = xFloat.toString() + ControlCommunicationConstants.DELIMITER + yFloat.toString();
+			if (!controlClientService.sendStringToServer(stringToSend)) {
+				Log.d("TouchControl", "ControlClientService wasn't able to send String");
 			}
 		}
 	}
@@ -250,7 +279,23 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	}
 	
 	public void clientServiceReceivedResponse(ClientSocketService theClientService, String response) {
+		Log.d("OUTPUT", "Response:  " + response);
+		String[] splitArray = response.split(ControlCommunicationConstants.DELIMITER);
 		
+		if (theClientService == mainClientService) {
+			if (splitArray.length >= 1) {
+				if (splitArray[0].equalsIgnoreCase(ControlCommunicationConstants.REQUEST_STATUS_FAILURE)) {
+					Log.d("OUTPUT", "Failure!!!:  ");
+				}
+			} else if (splitArray[0].equalsIgnoreCase(ControlCommunicationConstants.REQUEST_STATUS_SUCCESS)) {
+				if (splitArray.length >= 3) {
+					if (splitArray[1].equalsIgnoreCase(ControlCommunicationConstants.RESPONSE_TYPE_CONTROL_CONNECTION)) {
+						int port = Integer.parseInt(splitArray[2]);
+						this.makeControlClientServiceConnection(port);
+					}
+				}
+			}
+		}
 	}
     
     // Preferences changed in Server App
