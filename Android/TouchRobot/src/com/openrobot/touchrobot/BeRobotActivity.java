@@ -1,7 +1,6 @@
 package com.openrobot.touchrobot;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +15,8 @@ import android.widget.TextView;
 
 import com.openrobot.common.AmarinoService;
 import com.openrobot.common.ClientService;
-import com.openrobot.common.ClientServiceInterface;
+import com.openrobot.common.ClientSocketService;
+import com.openrobot.common.ClientSocketServiceInterface;
 import com.openrobot.common.ControlCommunicationConstants;
 import com.openrobot.common.DialogHelper;
 import com.openrobot.common.EditTextDialogInterface;
@@ -29,28 +29,31 @@ import com.openrobot.common.ThumbBall;
 import com.openrobot.common.ThumbBallListener;
 
 public class BeRobotActivity extends Activity implements ThumbBallListener, ServerSocketServiceInterface, 
-						ClientServiceInterface, EditTextDialogInterface {
+						ClientSocketServiceInterface, EditTextDialogInterface {
 	
 	private final String DEVICE_ADDRESS = "00:07:80:91:32:51";
 	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
 	private static final char ARDUINO_SHOULD_KILL_FUNCTION_FLAG = 'd';
 	private final boolean BLUETOOTH_ENABLED = false; 
 	
-	private static final int ARDUINO_MAC_DIALOG_TAG = 1;
-	private static final int SERVER_IP_DIALOG_TAG = 2;
-	private static final int SERVER_PORT_DIALOG_TAG = 3;
-	private static final int DEFINE_SERVER_PORT_DIALOG_TAG = 4;
-	
 	private static final String ARDUINO_MAC_ADDRESS_KEY = "ARDUINO_MAC_ADDRESS";
-	private static final String SERVER_IP_ADDRESS_KEY = "SERVER_IP_ADDRESS";
-	private static final String SERVER_PORT_ADDRESS_KEY = "SERVER_PORT_ADDRESS";
-	private static final String DEFINE_SERVER_PORT_ADDRESS_KEY = "DEFINE_SERVER_PORT_ADDRESS";
+	private static final String VIDEO_CLIENT_PORT_KEY = "VIDEO_CLIENT_PORT";
+	private static final String VIDEO_CLIENT_IP_KEY = "VIDEO_CLIENT_IP";
+	private static final String CONTROL_SERVER_PORT_KEY = "CONTROL_SERVER_PORT";
+
+	private static final int ARDUINO_MAC_DIALOG_TAG = 1;
+	private static final int VIDEO_CLIENT_PORT_DIALOG_TAG = 2;
+	private static final int VIDEO_CLIENT_IP_DIALOG_TAG = 3;
+	private static final int CONTROL_SERVER_PORT_DIALOG_TAG = 4;
 	
 	private static final String DEFAULT_ARDUINO_MAC_ADDRESS = "00:07:80:91:32:51";
-	private static final String DEFAULT_SERVER_IP_ADDRESS = "192.168.1.164";
-	private static final int DEFAULT_SERVER_PORT_ADDRESS = 8080;
-	private static final int DEFAULT_CONTROL_SERVER_PORT_ADDRESS = 8090;
+	public static final String DEFAULT_SERVER_IP_ADDRESS = "192.168.0.164";
 	
+	private static final int DEFAULT_SERVER_PORT_ADDRESS = 8080;
+	
+	public static final int DEFAULT_CONTROL_SERVER_PORT_ADDRESS = 8090;
+	public static final int DEFAULT_VIDEO_SERVER_PORT_ADDRESS = 8095;
+
 	
 	public final static int DELAY = 150;
 	public final static int CIRCLE_RADIUS = 40;
@@ -67,6 +70,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 	
 	private ServerSocketService mainServerService;
 	private ServerSocketService controlServerService;
+	private ClientSocketService videoClientService;
 	
 	private long lastChange;
 
@@ -119,7 +123,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 	private void makeMainServerServiceConnection() {
 		this.destroyMainServerServiceConnection();
 		mainServerService = new ServerSocketService(this);
-		mainServerService.makeConnection(this.getDefinedServerPortAddress());
+		mainServerService.makeConnection(DEFAULT_SERVER_PORT_ADDRESS);
 	}
 	
 	private void destroyMainServerServiceConnection() {
@@ -139,6 +143,19 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		if (controlServerService != null) {
 			controlServerService.disconnect();
 			controlServerService = null;
+		}	
+	}
+	
+	private void makeVideoClientServiceConnection() {
+		this.destroyVideoClientServiceConnection();
+		videoClientService = new ClientSocketService(this);
+		videoClientService.makeConnection(this.getVideoClientIP(), this.getVideoClientPort(), false);
+	}
+	
+	private void destroyVideoClientServiceConnection() {
+		if (videoClientService != null) {
+			videoClientService.disconnect();
+			videoClientService = null;
 		}	
 	}
     
@@ -169,13 +186,15 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		}
 		
 		this.destroyMainServerServiceConnection();
+		this.destroyControlServerServiceConnection();
+		this.destroyVideoClientServiceConnection();
     	super.onDestroy();
     }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        inflater.inflate(R.menu.be_robot_menu, menu);
         return true;
     }
     
@@ -184,31 +203,37 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     
         // Handle item selection
         switch (item.getItemId()) {
-        case R.id.toggle_server_state:
-        	if (mainServerService != null) {
-        		destroyMainServerServiceConnection();
+        case R.id.toggle_control_server_state:
+        	if (controlServerService != null) {
+        		destroyControlServerServiceConnection();
         	} else {
-        		makeMainServerServiceConnection();
+        		makeControlServerServiceConnection();
         	}
             return true;
-        case R.id.toggle_client_state:
-        	
+        case R.id.toggle_video_client_state:
+        	if (videoClientService != null) {
+        		destroyVideoClientServiceConnection();
+        	} else {
+        		makeVideoClientServiceConnection();
+        	}
             return true;
+
         case R.id.set_arduino_mac:
         	letUserSetArduinoMacAddress();
         	return true;
-        case R.id.define_server_port:
-        	letUserDefineServerPort();
+        	
+        case R.id.set_control_server_port:
+        	letUserSetControlServerPort();
         	return true;
-        case R.id.set_server_ip:
-        	letUserSetServerIPAddress();
+        case R.id.set_video_client_port:
+        	this.letUserSetVideoClientPort();
         	return true;
-        case R.id.set_server_port:
-        	letUserSetServerPort();
+        case R.id.set_video_client_ip:
+        	this.letUserSetVideoClientIP();
         	return true;
-        case R.id.server_settings:
-        case R.id.client_settings:
-        case R.id.curr_server_ip:
+        case R.id.control_server_settings:
+        case R.id.video_client_settings:
+        case R.id.curr_be_device_ip:
         default:
             return super.onOptionsItemSelected(item);
         }
@@ -216,49 +241,29 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     
     @Override
     public boolean onPrepareOptionsMenu (Menu menu) {
-    	MenuItem serverItem = menu.findItem(R.id.toggle_server_state);
-    	serverItem.setTitle(mainServerService != null ? R.string.stop_server : R.string.start_server);
+    	MenuItem controlServerItem = menu.findItem(R.id.toggle_control_server_state);
+    	controlServerItem.setTitle(controlServerService != null ? R.string.stop_control_server : R.string.start_control_server);
     	
-    	MenuItem clientItem = menu.findItem(R.id.toggle_client_state);
-    	//clientItem.setTitle(clientServiceIsBound ? R.string.stop_client : R.string.start_client);
-    	//clientItem.setEnabled(!serverServiceIsBound);
+    	MenuItem videoClientItem = menu.findItem(R.id.toggle_video_client_state);
+    	videoClientItem.setTitle(videoClientService != null ? R.string.stop_video_client : R.string.start_video_client);
     	
-    	MenuItem currServerIPItem = menu.findItem(R.id.curr_server_ip);
-    	currServerIPItem.setTitle("Server IP:  " + NetworkHelper.getLocalIpAddress());
-    	currServerIPItem.setEnabled(false);
-    	
+    	MenuItem currBeDeviceIP = menu.findItem(R.id.curr_be_device_ip);
+    	currBeDeviceIP.setTitle("Device IP:  " + NetworkHelper.getLocalIpAddress());
+    	currBeDeviceIP.setEnabled(false);
+    	    	
     	MenuItem arduinoMACItem = menu.findItem(R.id.set_arduino_mac);
     	arduinoMACItem.setTitle("Arduino:  " + getArduinoMACAddress());
-    	MenuItem defineServerPort = menu.findItem(R.id.define_server_port);
-    	defineServerPort.setTitle("Server Port #:  " + Integer.toString(getDefinedServerPortAddress()));
-    	MenuItem setServerPort = menu.findItem(R.id.set_server_port);
-    	setServerPort.setTitle("Server Port #:  " + Integer.toString(getServerPortAddress()));
-    	MenuItem setServerIP = menu.findItem(R.id.set_server_ip);
-    	setServerIP.setTitle("Server IP:  " + getServerIPAddress());
     	
+    	MenuItem setControlServerPort = menu.findItem(R.id.set_control_server_port);
+    	setControlServerPort.setTitle("Control Server Port: " + Integer.toString(this.getControlServerPort()));
+
+    	MenuItem setVideoClientIP = menu.findItem(R.id.set_video_client_ip);
+    	setVideoClientIP.setTitle("Video Client IP: " + this.getVideoClientIP());
+    	
+    	MenuItem setVideoClientPort = menu.findItem(R.id.set_video_client_port);
+    	setVideoClientPort.setTitle("Video Client Port: " + Integer.toString(this.getVideoClientPort()));
+    	    	
     	return true;
-    }
-    
-    // Methods used in Server App
-    private void letUserSetArduinoMacAddress() {
-    	DialogHelper.textEntryAlertDialog(this, "Set Arduino MAC", 
-    			this.getArduinoMACAddress(), this, ARDUINO_MAC_DIALOG_TAG).show();
-    }
-    
-    private void letUserDefineServerPort() {
-    	DialogHelper.textEntryAlertDialog(this, "Define Server Port", 
-    			Integer.toString(this.getDefinedServerPortAddress()), this, DEFINE_SERVER_PORT_DIALOG_TAG).show();
-    }
-    
-    // Methods used in Client App
-    private void letUserSetServerIPAddress() {
-    	DialogHelper.textEntryAlertDialog(this, "Set Server IP", 
-    			this.getServerIPAddress(), this, SERVER_IP_DIALOG_TAG).show();
-    }
-    
-    private void letUserSetServerPort() {
-    	DialogHelper.textEntryAlertDialog(this, "Set Server Port", 
-    			Integer.toString(this.getServerPortAddress()), this, SERVER_PORT_DIALOG_TAG).show();
     }
     
     
@@ -266,17 +271,16 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     public void dialogFinishedWithStatus(boolean positiveStatus, String endingString, int tag) {
     	if (positiveStatus) {
     		if (tag == ARDUINO_MAC_DIALOG_TAG) {
-    			PreferenceHelper.setPreferenceStringForKey(this, ARDUINO_MAC_ADDRESS_KEY, endingString);
-    		} else if (tag == DEFINE_SERVER_PORT_DIALOG_TAG) {
-    			PreferenceHelper.setPreferenceIntForKey(this, DEFINE_SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
-    		} else if (tag == SERVER_IP_DIALOG_TAG) {
-    			PreferenceHelper.setPreferenceStringForKey(this, SERVER_IP_ADDRESS_KEY, endingString);
-    		} else if (tag == SERVER_PORT_DIALOG_TAG) {
-    			PreferenceHelper.setPreferenceIntForKey(this, SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    			this.setArduinoMACAddress(endingString);
+    		} else if (tag == VIDEO_CLIENT_PORT_DIALOG_TAG) {
+    			this.setVideoClientPort(Integer.parseInt(endingString));
+    		} else if (tag == VIDEO_CLIENT_IP_DIALOG_TAG) {
+    			this.setVideoClientIP(endingString);
+    		} else if (tag == CONTROL_SERVER_PORT_DIALOG_TAG) {
+    			this.setControlServerPort(Integer.parseInt(endingString));
     		}
     	}
     }
-    
 
     // ThumbBallInterface
     @Override
@@ -288,7 +292,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
 	}
     
-    // ServerServiceInterface
+    // ServerSocketServiceInterface
     @Override
 	public void serverServiceStatusChange(ServerSocketService theService, String message, int status) {
     	Log.d("OUTPUT", message);
@@ -331,19 +335,16 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     	return null;
     }
     
-    
-    // ClientServiceInterface
-	public void clientServiceStatusChange(String message, int status) {
-		Log.d("OUTPUT", message);
-	}
+    // ClientSocketServiceInterface
+    public void clientServiceStatusChange(ClientSocketService theService, String message, int status) {
+    	Log.d("OUTPUT", message);
+    }
 	
 	public String messageToSend() {
-		Float xFloat = new Float(thumbBall.getX());
-		Float yFloat = new Float(thumbBall.getY());
-		return xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
+		return null;
 	}
 	
-	public void clientServiceReceivedResponse(ClientService theClientService, String response) {
+	public void clientServiceReceivedResponse(ClientSocketService theClientService, String response) {
 		
 	}
  
@@ -376,22 +377,67 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     }
     
     
-    // Preferences changed in Server App
+    
+    // ***************************
+	// VideoClientService Settings
+    // ***************************
+    private int getVideoClientPort() {
+    	return PreferenceHelper.getPreferenceIntForKey(this, VIDEO_CLIENT_PORT_KEY, BeRobotActivity.DEFAULT_VIDEO_SERVER_PORT_ADDRESS);
+    }
+    
+    private void setVideoClientPort(int newPort) {
+    	PreferenceHelper.setPreferenceIntForKey(this, VIDEO_CLIENT_PORT_KEY, newPort);
+    }
+    
+    private void letUserSetVideoClientPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Video Client Port", 
+    			Integer.toString(this.getVideoClientPort()), this, VIDEO_CLIENT_PORT_DIALOG_TAG).show();
+    }
+    
+    private String getVideoClientIP() {
+    	return PreferenceHelper.getPreferenceStringForKey(this, VIDEO_CLIENT_IP_KEY, BeRobotActivity.DEFAULT_SERVER_IP_ADDRESS);
+    }
+    
+    private void setVideoClientIP(String newIP) {
+    	PreferenceHelper.setPreferenceStringForKey(this, VIDEO_CLIENT_IP_KEY, newIP);
+    }
+    
+    private void letUserSetVideoClientIP() {
+    	DialogHelper.textEntryAlertDialog(this, "Video Client IP", 
+    			this.getVideoClientIP(), this, VIDEO_CLIENT_IP_DIALOG_TAG).show();
+    }
+    
+    // *****************************
+    // ControlServerService Settings
+    // *****************************
+    private int getControlServerPort() {
+    	return PreferenceHelper.getPreferenceIntForKey(this, CONTROL_SERVER_PORT_KEY, BeRobotActivity.DEFAULT_CONTROL_SERVER_PORT_ADDRESS);
+    }
+    
+    private void setControlServerPort(int newPort) {
+    	PreferenceHelper.setPreferenceIntForKey(this, CONTROL_SERVER_PORT_KEY, newPort);
+    }
+    
+    private void letUserSetControlServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Control Server Port", 
+    			Integer.toString(this.getControlServerPort()), this, CONTROL_SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    
+    // *****************************
+    // Arduino MAC Address settings
+    // *****************************
     private String getArduinoMACAddress() {
     	return PreferenceHelper.getPreferenceStringForKey(this, ARDUINO_MAC_ADDRESS_KEY, DEFAULT_ARDUINO_MAC_ADDRESS);
     }
     
-    private int getDefinedServerPortAddress() {
-    	return PreferenceHelper.getPreferenceIntForKey(this, DEFINE_SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
-    }
-        
-    // Preferences changed in Client App
-    private String getServerIPAddress() {
-    	return PreferenceHelper.getPreferenceStringForKey(this, SERVER_IP_ADDRESS_KEY, DEFAULT_SERVER_IP_ADDRESS);
+    private void setArduinoMACAddress(String newAddress) {
+    	PreferenceHelper.setPreferenceStringForKey(this, ARDUINO_MAC_ADDRESS_KEY, newAddress);
     }
     
-    private int getServerPortAddress() {
-    	return PreferenceHelper.getPreferenceIntForKey(this, SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    private void letUserSetArduinoMacAddress() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Arduino MAC", 
+    			this.getArduinoMACAddress(), this, ARDUINO_MAC_DIALOG_TAG).show();
     }
     
 }

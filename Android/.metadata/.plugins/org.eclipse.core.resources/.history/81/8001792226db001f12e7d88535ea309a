@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/toggle_control_server_state"
+          android:title="Start Server" />
+    <item android:id="@+id/toggle_client_state"
+          android:title="Start Client" />
+          
+      <item android:id="@+id/server_settings"
+          android:title="Server App Settings" >
+        <menu>
+            <item android:id="@+id/set_arduino_mac"
+                  android:title="Arduino MAC Address" />
+            <item android:id="@+id/define_server_port"
+                  android:title="Server Port #" />
+            <item android:id="@+id/curr_server_ip"
+            	  android:title="Current Server IP" />
+        </menu>
+    </item>
+    <item android:id="@+id/client_settings"
+          android:title="Client App Settings" >
+        <menu>
+            <item android:id="@+id/set_server_ip"
+                  android:title="Server IP Address" />
+            <item android:id="@+id/set_server_port"
+                  android:title="Server Port #" />
+        </menu>
+    </item>
+</menu>

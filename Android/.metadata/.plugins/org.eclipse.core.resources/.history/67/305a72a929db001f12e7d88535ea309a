@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TouchRobot</string>    
+    <string name="start_control_server">Start Control Server</string>
+    <string name="stop_control_server">Stop Control Server</string>
+    <string name="stop_control_client">Stop Client</string>
+    <string name="start_control_client">Start Client</string>
+     <string name="stop_video_client">Stop Client</string>
+    <string name="start_video_client">Start Client</string>
+    
+    <string name="client_service_connected">ClientService Connected</string>
+    <string name="server_service_connected">ServerService Connected</string>
+    <string name="client_service_disconnected">ClientService Disconnected</string>
+    <string name="server_service_disconnected">ServerService Disconnected</string>
+</resources>

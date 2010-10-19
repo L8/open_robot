@@ -1,0 +1,393 @@
+package com.openrobot.touchrobot;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+
+import com.openrobot.common.AmarinoService;
+import com.openrobot.common.ClientService;
+import com.openrobot.common.ClientServiceInterface;
+import com.openrobot.common.ControlCommunicationConstants;
+import com.openrobot.common.DialogHelper;
+import com.openrobot.common.EditTextDialogInterface;
+import com.openrobot.common.NetworkHelper;
+import com.openrobot.common.PreferenceHelper;
+import com.openrobot.common.ServerService;
+import com.openrobot.common.ServerSocketService;
+import com.openrobot.common.ServerSocketServiceInterface;
+import com.openrobot.common.ThumbBall;
+import com.openrobot.common.ThumbBallListener;
+
+public class BeRobotActivity extends Activity implements ThumbBallListener, ServerSocketServiceInterface, 
+						ClientServiceInterface, EditTextDialogInterface {
+	
+	private final String DEVICE_ADDRESS = "00:07:80:91:32:51";
+	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
+	private static final char ARDUINO_SHOULD_KILL_FUNCTION_FLAG = 'd';
+	private final boolean BLUETOOTH_ENABLED = false; 
+	
+	private static final int ARDUINO_MAC_DIALOG_TAG = 1;
+	private static final int SERVER_IP_DIALOG_TAG = 2;
+	private static final int SERVER_PORT_DIALOG_TAG = 3;
+	private static final int DEFINE_SERVER_PORT_DIALOG_TAG = 4;
+	
+	private static final String ARDUINO_MAC_ADDRESS_KEY = "ARDUINO_MAC_ADDRESS";
+	private static final String SERVER_IP_ADDRESS_KEY = "SERVER_IP_ADDRESS";
+	private static final String SERVER_PORT_ADDRESS_KEY = "SERVER_PORT_ADDRESS";
+	private static final String DEFINE_SERVER_PORT_ADDRESS_KEY = "DEFINE_SERVER_PORT_ADDRESS";
+	
+	private static final String DEFAULT_ARDUINO_MAC_ADDRESS = "00:07:80:91:32:51";
+	private static final String DEFAULT_SERVER_IP_ADDRESS = "192.168.1.164";
+	private static final int DEFAULT_SERVER_PORT_ADDRESS = 8080;
+	private static final int DEFAULT_CONTROL_SERVER_PORT_ADDRESS = 8090;
+	
+	
+	public final static int DELAY = 150;
+	public final static int CIRCLE_RADIUS = 40;
+	
+	private ThumbBall thumbBall;
+	private TextView xPosTextView;
+	private TextView yPosTextView;
+	private FrameLayout main;
+	private Button killButton;
+	
+	private boolean shouldKill = false;
+	private boolean shouldEnable = false;
+	private boolean killEnabled = false;
+	
+	private ServerSocketService mainServerService;
+	private ServerSocketService controlServerService;
+	
+	private long lastChange;
+
+	
+	private AmarinoService amarinoService;
+
+	@Override
+	  public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.be_robot_main);
+	          
+        if (BLUETOOTH_ENABLED) {
+        	amarinoService = new AmarinoService(this, DEVICE_ADDRESS);
+        }
+        
+        lastChange = System.currentTimeMillis();
+        
+        main = (FrameLayout) findViewById(R.id.main_view);
+        main.setBackgroundColor(Color.CYAN);
+        
+        xPosTextView = (TextView)findViewById(R.id.x_position_textview);
+        yPosTextView = (TextView)findViewById(R.id.y_position_textview);
+        
+        thumbBall = new ThumbBall(this, 
+        		(main.getRight() - main.getLeft()) / 2, 
+        		(main.getBottom() - main.getTop()) / 2 ,
+        		CIRCLE_RADIUS);
+        thumbBall.setDelegate(this);
+        main.addView(thumbBall);
+        
+        this.killButton = (Button)this.findViewById(R.id.kill_button);
+        this.killButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	if (killEnabled) {
+            		shouldEnable = true;
+            		shouldKill = false;
+            		killEnabled = false;
+            		killButton.setText("Stop, please");
+            	} else {
+            		shouldEnable = false;
+            		shouldKill = true;
+            		killEnabled = true;
+            		killButton.setText("OK, Game On.");
+            	}
+            }         
+        });
+    }
+	
+	private void makeMainServerServiceConnection() {
+		this.destroyMainServerServiceConnection();
+		mainServerService = new ServerSocketService(this);
+		mainServerService.makeConnection(this.getDefinedServerPortAddress());
+	}
+	
+	private void destroyMainServerServiceConnection() {
+		if (mainServerService != null) {
+			mainServerService.disconnect();
+			mainServerService = null;
+		}	
+	}
+	
+	private void makeControlServerServiceConnection() {
+		this.destroyMainServerServiceConnection();
+		controlServerService = new ServerSocketService(this);
+		controlServerService.makeConnection(DEFAULT_CONTROL_SERVER_PORT_ADDRESS);
+	}
+	
+	private void destroyControlServerServiceConnection() {
+		if (controlServerService != null) {
+			controlServerService.disconnect();
+			controlServerService = null;
+		}	
+	}
+    
+    
+    @Override
+    public void onStart() {
+    	super.onStart();
+    	thumbBall.setX(ThumbBall.FRAME_WIDTH / 2);
+    	thumbBall.setY(ThumbBall.FRAME_HEIGHT / 2);
+    	thumbBall.invalidate();
+    }
+    
+    @Override
+	protected void onStop() {
+		super.onStop();
+		
+		// Housekeeping
+		if (amarinoService != null) {
+			amarinoService.disconnect();
+		}
+	}
+    
+    @Override
+    protected void onDestroy() {
+    	// prevents circular reference memory leak ???
+		if (thumbBall != null) {
+			thumbBall.setDelegate(null);
+		}
+		
+		this.destroyMainServerServiceConnection();
+    	super.onDestroy();
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.toggle_server_state:
+        	if (mainServerService != null) {
+        		destroyMainServerServiceConnection();
+        	} else {
+        		makeMainServerServiceConnection();
+        	}
+            return true;
+        case R.id.toggle_client_state:
+        	
+            return true;
+        case R.id.set_arduino_mac:
+        	letUserSetArduinoMacAddress();
+        	return true;
+        case R.id.define_server_port:
+        	letUserDefineServerPort();
+        	return true;
+        case R.id.set_server_ip:
+        	letUserSetServerIPAddress();
+        	return true;
+        case R.id.set_server_port:
+        	letUserSetServerPort();
+        	return true;
+        case R.id.server_settings:
+        case R.id.client_settings:
+        case R.id.curr_server_ip:
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+    	MenuItem serverItem = menu.findItem(R.id.toggle_server_state);
+    	serverItem.setTitle(mainServerService != null ? R.string.stop_server : R.string.start_server);
+    	
+    	MenuItem currServerIPItem = menu.findItem(R.id.curr_server_ip);
+    	currServerIPItem.setTitle("Server IP:  " + NetworkHelper.getLocalIpAddress());
+    	currServerIPItem.setEnabled(false);
+    	
+    	MenuItem arduinoMACItem = menu.findItem(R.id.set_arduino_mac);
+    	arduinoMACItem.setTitle("Arduino:  " + getArduinoMACAddress());
+    	MenuItem defineServerPort = menu.findItem(R.id.define_server_port);
+    	defineServerPort.setTitle("Server Port #:  " + Integer.toString(getDefinedServerPortAddress()));
+    	MenuItem setServerPort = menu.findItem(R.id.set_server_port);
+    	setServerPort.setTitle("Server Port #:  " + Integer.toString(getServerPortAddress()));
+    	MenuItem setServerIP = menu.findItem(R.id.set_server_ip);
+    	setServerIP.setTitle("Server IP:  " + getServerIPAddress());
+    	
+    	return true;
+    }
+    
+    // Methods used in Server App
+    private void letUserSetArduinoMacAddress() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Arduino MAC", 
+    			this.getArduinoMACAddress(), this, ARDUINO_MAC_DIALOG_TAG).show();
+    }
+    
+    private void letUserDefineServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Define Server Port", 
+    			Integer.toString(this.getDefinedServerPortAddress()), this, DEFINE_SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    // Methods used in Client App
+    private void letUserSetServerIPAddress() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Server IP", 
+    			this.getServerIPAddress(), this, SERVER_IP_DIALOG_TAG).show();
+    }
+    
+    private void letUserSetServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Set Server Port", 
+    			Integer.toString(this.getServerPortAddress()), this, SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    
+    // EditTextDialogInterface
+    public void dialogFinishedWithStatus(boolean positiveStatus, String endingString, int tag) {
+    	if (positiveStatus) {
+    		if (tag == ARDUINO_MAC_DIALOG_TAG) {
+    			PreferenceHelper.setPreferenceStringForKey(this, ARDUINO_MAC_ADDRESS_KEY, endingString);
+    		} else if (tag == DEFINE_SERVER_PORT_DIALOG_TAG) {
+    			PreferenceHelper.setPreferenceIntForKey(this, DEFINE_SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		} else if (tag == SERVER_IP_DIALOG_TAG) {
+    			PreferenceHelper.setPreferenceStringForKey(this, SERVER_IP_ADDRESS_KEY, endingString);
+    		} else if (tag == SERVER_PORT_DIALOG_TAG) {
+    			PreferenceHelper.setPreferenceIntForKey(this, SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		}
+    	}
+    }
+    
+
+    // ThumbBallInterface
+    @Override
+	public void thumbBallPositionChanged(ThumbBall tb) {
+		Log.d("OUTPUT", "X: " + tb.getX() + "  Y: " + tb.getY());
+		xPosTextView.setText(Integer.toString(tb.translatedX()));
+		yPosTextView.setText(Integer.toString(-tb.translatedY()));
+		
+		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
+	}
+    
+    // ServerServiceInterface
+    @Override
+	public void serverServiceStatusChange(ServerSocketService theService, String message, int status) {
+    	Log.d("OUTPUT", message);
+    }
+    
+    @Override
+	public String serverServiceReceivedMessage(ServerSocketService service, String message) {
+    	
+    	String[] splitArray = message.split(ControlCommunicationConstants.DELIMITER);
+    	
+    	if (service == mainServerService) {
+    		Log.d("OUTPUT", "Message:  " + message);
+    		String response = null;
+    		if (splitArray.length >= 1) {
+    			if (splitArray[0].equalsIgnoreCase(ControlCommunicationConstants.REQUEST_TYPE_CONTROL_CONNECTION)) {
+    				
+    				if (controlServerService != null) { // already bound
+    					response = ControlCommunicationConstants.REQUEST_STATUS_FAILURE;
+    				} else {
+    					response = ControlCommunicationConstants.REQUEST_STATUS_SUCCESS + ControlCommunicationConstants.DELIMITER + ControlCommunicationConstants.RESPONSE_TYPE_CONTROL_CONNECTION + ControlCommunicationConstants.DELIMITER + BeRobotActivity.DEFAULT_CONTROL_SERVER_PORT_ADDRESS;
+    					return response;
+    				}
+    			}
+    		}
+    		return response; 		
+    	} else if (service == controlServerService) {
+    		//Log.d("OUTPUT", "Message:  " + message);
+        	if (splitArray.length >= 2) {
+        		
+        		float x = Float.parseFloat(((String)splitArray[0]));
+        		float y = Float.parseFloat(((String)splitArray[1]));
+        		Log.d("OUTPUT", splitArray[0] + ",  " + x + "        " + splitArray[1] + ",  " + y);
+        		thumbBall.setX(x);
+        		thumbBall.setY(y);
+        		thumbBall.invalidate();
+        		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
+        	}
+        	return null;
+    	}
+    	return null;
+    }
+    
+    
+    // ClientServiceInterface
+	public void clientServiceStatusChange(String message, int status) {
+		Log.d("OUTPUT", message);
+	}
+	
+	public String messageToSend() {
+		Float xFloat = new Float(thumbBall.getX());
+		Float yFloat = new Float(thumbBall.getY());
+		return xFloat.toString() + ServerService.SERVER_DELIMITER + yFloat.toString();
+	}
+	
+	public void clientServiceReceivedResponse(ClientService theClientService, String response) {
+		
+	}
+ 
+    private void messageArduinoIfAppropriate(int x, int y) {
+    	if (shouldKill || shouldEnable) {
+    		// Send unconditional kill or resume message
+    		if (BLUETOOTH_ENABLED) {
+    			if (amarinoService != null) {
+    				amarinoService.sendIntToArduino(shouldKill ? 1 : 0, ARDUINO_SHOULD_KILL_FUNCTION_FLAG);
+    			}
+    			lastChange = System.currentTimeMillis();
+    		}
+			shouldKill = false;
+			shouldEnable = false;
+			thumbBall.zeroThumbBallPosition();
+			return;
+		}
+    	if (System.currentTimeMillis() - lastChange > DELAY ) {
+    		lastChange = System.currentTimeMillis();
+			int[] values = new int[2];
+			values[0] = x;   
+			values[1] = y;
+			
+			if (BLUETOOTH_ENABLED) {
+				if (amarinoService != null) {
+					amarinoService.sendIntArrayToArduino(values, ARDUINO_CONTROL_INPUT_FUNCTION_FLAG);	
+				}			
+			}
+		}
+    }
+    
+    
+    // Preferences changed in Server App
+    private String getArduinoMACAddress() {
+    	return PreferenceHelper.getPreferenceStringForKey(this, ARDUINO_MAC_ADDRESS_KEY, DEFAULT_ARDUINO_MAC_ADDRESS);
+    }
+    
+    private int getDefinedServerPortAddress() {
+    	return PreferenceHelper.getPreferenceIntForKey(this, DEFINE_SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    }
+        
+    // Preferences changed in Client App
+    private String getServerIPAddress() {
+    	return PreferenceHelper.getPreferenceStringForKey(this, SERVER_IP_ADDRESS_KEY, DEFAULT_SERVER_IP_ADDRESS);
+    }
+    
+    private int getServerPortAddress() {
+    	return PreferenceHelper.getPreferenceIntForKey(this, SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    }
+    
+}

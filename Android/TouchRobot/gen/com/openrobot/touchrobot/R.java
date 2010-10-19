@@ -14,23 +14,31 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int client_settings=0x7f060010;
+        public static final int control_client_settings=0x7f060015;
         public static final int control_robot_activity_button=0x7f060007;
-        public static final int curr_server_ip=0x7f06000f;
-        public static final int define_server_port=0x7f06000e;
+        public static final int control_server_settings=0x7f06000c;
+        public static final int curr_be_device_ip=0x7f06000f;
+        public static final int curr_control_device_ip=0x7f06001a;
         public static final int dialog_edittext=0x7f060009;
         public static final int dialog_root_view=0x7f060008;
         public static final int kill_button=0x7f060004;
         public static final int main_view=0x7f060002;
         public static final int on_robot_activity_button=0x7f060005;
-        public static final int server_settings=0x7f06000c;
         public static final int set_arduino_mac=0x7f06000d;
-        public static final int set_server_ip=0x7f060011;
-        public static final int set_server_port=0x7f060012;
+        public static final int set_control_client_ip=0x7f060016;
+        public static final int set_control_client_port=0x7f060017;
+        public static final int set_control_server_port=0x7f06000e;
+        public static final int set_video_client_ip=0x7f060011;
+        public static final int set_video_client_port=0x7f060012;
+        public static final int set_video_server_port=0x7f060019;
         public static final int spacer_view=0x7f060003;
         public static final int spacer_view2=0x7f060006;
-        public static final int toggle_client_state=0x7f06000b;
-        public static final int toggle_server_state=0x7f06000a;
+        public static final int toggle_control_client_state=0x7f060013;
+        public static final int toggle_control_server_state=0x7f06000a;
+        public static final int toggle_video_client_state=0x7f06000b;
+        public static final int toggle_video_server_state=0x7f060014;
+        public static final int video_client_settings=0x7f060010;
+        public static final int video_server_settings=0x7f060018;
         public static final int x_position_textview=0x7f060000;
         public static final int y_position_textview=0x7f060001;
     }
@@ -41,18 +49,23 @@ public final class R {
         public static final int string_setting_dialog=0x7f030003;
     }
     public static final class menu {
-        public static final int options_menu=0x7f050000;
+        public static final int be_robot_menu=0x7f050000;
+        public static final int control_robot_menu=0x7f050001;
     }
     public static final class string {
         public static final int app_name=0x7f040001;
-        public static final int client_service_connected=0x7f040006;
-        public static final int client_service_disconnected=0x7f040008;
+        public static final int client_service_connected=0x7f04000a;
+        public static final int client_service_disconnected=0x7f04000c;
         public static final int hello=0x7f040000;
-        public static final int server_service_connected=0x7f040007;
-        public static final int server_service_disconnected=0x7f040009;
-        public static final int start_client=0x7f040003;
-        public static final int start_server=0x7f040002;
-        public static final int stop_client=0x7f040005;
-        public static final int stop_server=0x7f040004;
+        public static final int server_service_connected=0x7f04000b;
+        public static final int server_service_disconnected=0x7f04000d;
+        public static final int start_control_client=0x7f040005;
+        public static final int start_control_server=0x7f040002;
+        public static final int start_video_client=0x7f040007;
+        public static final int start_video_server=0x7f040008;
+        public static final int stop_control_client=0x7f040004;
+        public static final int stop_control_server=0x7f040003;
+        public static final int stop_video_client=0x7f040006;
+        public static final int stop_video_server=0x7f040009;
     }
 }

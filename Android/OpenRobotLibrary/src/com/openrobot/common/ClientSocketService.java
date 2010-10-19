@@ -95,10 +95,6 @@ public class ClientSocketService implements SleepyProducerConsumerInterface {
                                 if (shouldWaitForServerResponse) {
                                 	currentlyWaitingForServerResponse = true;
                                 }     
-                                while ((line = in.readLine()) != null) {
-                                	delegate.clientServiceReceivedResponse(getThis(), line);
-                                	currentlyWaitingForServerResponse = false;
-                                }
                         	} else if (currentlyWaitingForServerResponse && (line = in.readLine()) != null) {
                         		delegate.clientServiceReceivedResponse(getThis(), line);
                         		currentlyWaitingForServerResponse = false;

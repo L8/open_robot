@@ -22,23 +22,21 @@ import com.openrobot.common.EditTextDialogInterface;
 import com.openrobot.common.NetworkHelper;
 import com.openrobot.common.PreferenceHelper;
 import com.openrobot.common.ServerService;
+import com.openrobot.common.ServerSocketService;
+import com.openrobot.common.ServerSocketServiceInterface;
 import com.openrobot.common.ThumbBall;
 import com.openrobot.common.ThumbBallListener;
 
 public class ControlRobotActivity extends Activity implements ThumbBallListener, 
-						ClientSocketServiceInterface, EditTextDialogInterface {
+						ClientSocketServiceInterface, ServerSocketServiceInterface, EditTextDialogInterface {
 		
-	private static final int SERVER_IP_DIALOG_TAG = 2;
-	private static final int SERVER_PORT_DIALOG_TAG = 3;
-	private static final int DEFINE_SERVER_PORT_DIALOG_TAG = 4;
+	private static final int CONTROL_CLIENT_IP_DIALOG_TAG = 2;
+	private static final int CONTROL_CLIENT_PORT_DIALOG_TAG = 3;
+	private static final int VIDEO_SERVER_PORT_DIALOG_TAG = 4;
 	
-	private static final String SERVER_IP_ADDRESS_KEY = "SERVER_IP_ADDRESS";
-	private static final String SERVER_PORT_ADDRESS_KEY = "SERVER_PORT_ADDRESS";
-	private static final String DEFINE_SERVER_PORT_ADDRESS_KEY = "DEFINE_SERVER_PORT_ADDRESS";
-	
-	private static final String DEFAULT_SERVER_IP_ADDRESS = "192.168.1.164";
-	private static final int DEFAULT_SERVER_PORT_ADDRESS = 8080;
-	
+	private static final String CONTROL_CLIENT_IP_KEY = "CONTROL_CLIENT_IP";
+	private static final String CONTROL_CLIENT_PORT_KEY = "CONTROL_CLIENT_PORT";
+	private static final String VIDEO_SERVER_PORT_KEY = "VIDEO_SERVER_PORT";
 	
 	public final static int DELAY = 150;
 	public final static int CIRCLE_RADIUS = 40;
@@ -55,6 +53,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	
 	private ClientSocketService mainClientService;
 	private ClientSocketService controlClientService;
+	private ServerSocketService videoServerService;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -96,6 +95,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
         });
     }
     
+	/*
     private void makeMainClientServiceConnection() {
 		this.destroyMainClientServiceConnection();
 		mainClientService = new ClientSocketService(this);
@@ -108,11 +108,11 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 			mainClientService = null;
 		}	
 	}
-	
+	*/
 	 private void makeControlClientServiceConnection(int port) {
 			this.destroyControlClientServiceConnection();
 			controlClientService = new ClientSocketService(this);
-			controlClientService.makeConnection(getServerIPAddress(), port, false);
+			controlClientService.makeConnection(this.getControlClientIP(), port, false);
 		}
 		
 	private void destroyControlClientServiceConnection() {
@@ -121,6 +121,20 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 			controlClientService = null;
 		}	
 	}
+	
+	private void makeVideoServerServiceConnection() {
+		this.destroyVideoServerServiceConnection();
+		videoServerService = new ServerSocketService(this);
+		videoServerService.makeConnection(this.getVideoServerPort());
+	}
+	
+	private void destroyVideoServerServiceConnection() {
+		if (videoServerService != null) {
+			videoServerService.disconnect();
+			videoServerService = null;
+		}	
+	}
+	
     
 	private void makeControlConnectionRequest() {
 		if (mainClientService != null && mainClientService.isConnected()) {
@@ -130,6 +144,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 			}
 		}
 	}
+	
 	
     @Override
     public void onStart() {
@@ -150,7 +165,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 		if (thumbBall != null) {
 			thumbBall.setDelegate(null);
 		}
-		destroyMainClientServiceConnection();
+		destroyVideoServerServiceConnection();
 		destroyControlClientServiceConnection();
     	super.onDestroy();
     }
@@ -158,7 +173,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        inflater.inflate(R.menu.control_robot_menu, menu);
         return true;
     }
     
@@ -167,26 +182,32 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
     
         // Handle item selection
         switch (item.getItemId()) {
-        case R.id.toggle_client_state:
-        	if (this.mainClientService != null) {
-        		destroyMainClientServiceConnection();
+        case R.id.toggle_control_client_state:
+        	if (this.controlClientService != null) {
         		destroyControlClientServiceConnection();
         	} else {
-        		makeMainClientServiceConnection();
+        		makeControlClientServiceConnection(BeRobotActivity.DEFAULT_CONTROL_SERVER_PORT_ADDRESS);
         	}
             return true;
-        case R.id.define_server_port:
-        	letUserDefineServerPort();
+        case R.id.toggle_video_server_state:
+        	if (this.videoServerService != null) {
+        		destroyVideoServerServiceConnection();
+        	} else {
+        		makeVideoServerServiceConnection();
+        	}
         	return true;
-        case R.id.set_server_ip:
-        	letUserSetServerIPAddress();
+        case R.id.set_control_client_port:
+        	this.letUserSetControlClientPort();
         	return true;
-        case R.id.set_server_port:
-        	letUserSetServerPort();
+        case R.id.set_control_client_ip:
+        	this.letUserSetControlClientIP();
         	return true;
-        case R.id.server_settings:
-        case R.id.client_settings:
-        case R.id.curr_server_ip:
+        case R.id.set_video_server_port:
+        	this.letUserSetVideoServerPort();
+        	return true;
+        case R.id.video_server_settings:
+        case R.id.control_client_settings:
+        case R.id.curr_control_device_ip:
         default:
             return super.onOptionsItemSelected(item);
         }
@@ -195,57 +216,40 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
     @Override
     public boolean onPrepareOptionsMenu (Menu menu) {
     
-    	MenuItem clientItem = menu.findItem(R.id.toggle_client_state);
-    	clientItem.setTitle(mainClientService != null ? R.string.stop_client : R.string.start_client);
-    	clientItem.setEnabled(true);
+    	MenuItem controlClientItem = menu.findItem(R.id.toggle_control_client_state);
+    	controlClientItem.setTitle(controlClientService != null ? R.string.stop_control_client : R.string.start_control_client);
+    	controlClientItem.setEnabled(true);
     	
-    	MenuItem currServerIPItem = menu.findItem(R.id.curr_server_ip);
-    	currServerIPItem.setTitle("Server IP:  " + NetworkHelper.getLocalIpAddress());
+    	MenuItem serverVideoItem = menu.findItem(R.id.toggle_video_server_state);
+    	serverVideoItem.setTitle(videoServerService != null ? R.string.stop_video_server : R.string.start_video_server);
+    	
+    	MenuItem setVideoServerPort = menu.findItem(R.id.set_video_server_port);
+    	setVideoServerPort.setTitle("Video Server Port: " + Integer.toString(this.getVideoServerPort()));
+    	
+    	MenuItem currServerIPItem = menu.findItem(R.id.curr_control_device_ip);
+    	currServerIPItem.setTitle("Device IP:  " + NetworkHelper.getLocalIpAddress());
     	currServerIPItem.setEnabled(false);
-    	MenuItem defineServerPort = menu.findItem(R.id.define_server_port);
-    	defineServerPort.setTitle("Server Port #:  " + Integer.toString(getDefinedServerPortAddress()));
-    	MenuItem setServerPort = menu.findItem(R.id.set_server_port);
-    	setServerPort.setTitle("Server Port #:  " + Integer.toString(getServerPortAddress()));
-    	MenuItem setServerIP = menu.findItem(R.id.set_server_ip);
-    	setServerIP.setTitle("Server IP:  " + getServerIPAddress());
+    	
+    	MenuItem setControlClientPort = menu.findItem(R.id.set_control_client_port);
+    	setControlClientPort.setTitle("Control Client Port: " + Integer.toString(this.getControlClientPort()));
+    	
+    	MenuItem setControlClientIP = menu.findItem(R.id.set_control_client_ip);
+    	setControlClientIP.setTitle("Control IP: " + this.getControlClientIP());
     	
     	return true;
     }
     
-    // Methods used in Server App
-    
-    private void letUserDefineServerPort() {
-    	DialogHelper.textEntryAlertDialog(this, "Define Server Port", 
-    			Integer.toString(this.getDefinedServerPortAddress()), this, DEFINE_SERVER_PORT_DIALOG_TAG).show();
-    }
-    
-    // Methods used in Client App
-    private void letUserSetServerIPAddress() {
-    	DialogHelper.textEntryAlertDialog(this, "Set Server IP", 
-    			this.getServerIPAddress(), this, SERVER_IP_DIALOG_TAG).show();
-    }
-    
-    private void letUserSetServerPort() {
-    	DialogHelper.textEntryAlertDialog(this, "Set Server Port", 
-    			Integer.toString(this.getServerPortAddress()), this, SERVER_PORT_DIALOG_TAG).show();
-    }
-    
-    
     // EditTextDialogInterface
     public void dialogFinishedWithStatus(boolean positiveStatus, String endingString, int tag) {
     	if (positiveStatus) {
-    		if (tag == DEFINE_SERVER_PORT_DIALOG_TAG) {
-    			PreferenceHelper.setPreferenceIntForKey(this, DEFINE_SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
-    		} else if (tag == SERVER_IP_DIALOG_TAG) {
-    			PreferenceHelper.setPreferenceStringForKey(this, SERVER_IP_ADDRESS_KEY, endingString);
-    		} else if (tag == SERVER_PORT_DIALOG_TAG) {
-    			PreferenceHelper.setPreferenceIntForKey(this, SERVER_PORT_ADDRESS_KEY, Integer.parseInt(endingString));
+    		if (tag == CONTROL_CLIENT_PORT_DIALOG_TAG) {
+    			this.setControlClientPort(Integer.parseInt(endingString));
+    		} else if (tag == CONTROL_CLIENT_IP_DIALOG_TAG) {
+    			this.setControlClientIP(endingString);
+    		} else if (tag == VIDEO_SERVER_PORT_DIALOG_TAG) {
+    			this.setVideoServerPort(Integer.parseInt(endingString));
     		}
     	}
-    }
-    
-    private Context currentContext() {
-    	return this;
     }
     
     // ThumbBallInterface
@@ -297,19 +301,63 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 			}
 		}
 	}
-    
-    // Preferences changed in Server App
-    private int getDefinedServerPortAddress() {
-    	return PreferenceHelper.getPreferenceIntForKey(this, DEFINE_SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
-    }
-        
-    // Preferences changed in Client App
-    private String getServerIPAddress() {
-    	return PreferenceHelper.getPreferenceStringForKey(this, SERVER_IP_ADDRESS_KEY, DEFAULT_SERVER_IP_ADDRESS);
+	
+	
+	
+	 @Override
+	public void serverServiceStatusChange(ServerSocketService theService, String message, int status) {
+    	Log.d("OUTPUT", message);
     }
     
-    private int getServerPortAddress() {
-    	return PreferenceHelper.getPreferenceIntForKey(this, SERVER_PORT_ADDRESS_KEY, DEFAULT_SERVER_PORT_ADDRESS);
+    @Override
+	public String serverServiceReceivedMessage(ServerSocketService service, String message) {
+    	return null;
+    }
+
+	
+    // ***************************
+	// VideoServerService Settings
+    // ***************************
+    private int getVideoServerPort() {
+    	return PreferenceHelper.getPreferenceIntForKey(this, VIDEO_SERVER_PORT_KEY, BeRobotActivity.DEFAULT_VIDEO_SERVER_PORT_ADDRESS);
     }
     
+    private void setVideoServerPort(int newPort) {
+    	PreferenceHelper.setPreferenceIntForKey(this, VIDEO_SERVER_PORT_KEY, newPort);
+    }
+    
+    private void letUserSetVideoServerPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Video Server Port", 
+    			Integer.toString(this.getVideoServerPort()), this, VIDEO_SERVER_PORT_DIALOG_TAG).show();
+    }
+    
+    // *****************************
+    // ControlClientService Settings
+    // *****************************
+    private int getControlClientPort() {
+    	return PreferenceHelper.getPreferenceIntForKey(this, CONTROL_CLIENT_PORT_KEY, BeRobotActivity.DEFAULT_CONTROL_SERVER_PORT_ADDRESS);
+    }
+    
+    private void setControlClientPort(int newPort) {
+    	PreferenceHelper.setPreferenceIntForKey(this, CONTROL_CLIENT_PORT_KEY, newPort);
+    }
+    
+    private void letUserSetControlClientPort() {
+    	DialogHelper.textEntryAlertDialog(this, "Control Client Port", 
+    			Integer.toString(this.getControlClientPort()), this, CONTROL_CLIENT_PORT_DIALOG_TAG).show();
+    }
+    
+    private String getControlClientIP() {
+    	return PreferenceHelper.getPreferenceStringForKey(this, CONTROL_CLIENT_IP_KEY, BeRobotActivity.DEFAULT_SERVER_IP_ADDRESS);
+    }
+    
+    private void setControlClientIP(String newIP) {
+    	PreferenceHelper.setPreferenceStringForKey(this, CONTROL_CLIENT_IP_KEY, newIP);
+    }
+    
+    private void letUserSetControlClientIP() {
+    	DialogHelper.textEntryAlertDialog(this, "Control Client IP", 
+    			this.getControlClientIP(), this, CONTROL_CLIENT_IP_DIALOG_TAG).show();
+    }
+
 }

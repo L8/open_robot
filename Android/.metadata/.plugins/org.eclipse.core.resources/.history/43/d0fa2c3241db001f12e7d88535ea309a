@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/toggle_control_server_state"
+          android:title="Start Control Server" />
+    <item android:id="@+id/toggle_video_client_state"
+          android:title="Start Video Client" />
+          
+      <item android:id="@+id/control_server_settings"
+          android:title="Control Server Settings" >
+        <menu>
+            <item android:id="@+id/set_arduino_mac"
+                  android:title="Arduino MAC Address" />
+            <item android:id="@+id/set_control_server_port"
+                  android:title="Control Server Port" />
+            <item android:id="@+id/curr_control_server_ip"
+            	  android:title="Control Server IP" />
+        </menu>
+    </item>
+    <item android:id="@+id/video_client_settings"
+          android:title="Video Client Settings" >
+        <menu>
+            <item android:id="@+id/set_video_client_ip"
+                  android:title="Video Client IP" />
+            <item android:id="@+id/set_video_client_port"
+                  android:title="Video Client Port" />
+        </menu>
+    </item>
+</menu>
