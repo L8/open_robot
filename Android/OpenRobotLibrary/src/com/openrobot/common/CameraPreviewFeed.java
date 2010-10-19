@@ -118,7 +118,7 @@ public class CameraPreviewFeed implements Callback {
 		
 		try {
             YuvImage yuvImage = new YuvImage(imageData, previewFormat, previewWidth, previewHeight, null);
-            yuvImage.compressToJpeg(r, 20, out); // Tweak the quality here - 20 seems pretty decent for quality + size.
+            yuvImage.compressToJpeg(r, 0, out); // Tweak the quality here - 20 seems pretty decent for quality + size.
             
             delegate.newImageFromCameraPreviewFeed(this, out.toByteArray());
             

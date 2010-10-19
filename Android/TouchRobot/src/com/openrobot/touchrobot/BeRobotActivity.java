@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.openrobot.common.AmarinoService;
 import com.openrobot.common.CameraPreviewFeed;
 import com.openrobot.common.CameraPreviewFeedInterface;
+import com.openrobot.common.ClientSocketByteService;
 import com.openrobot.common.ClientSocketService;
 import com.openrobot.common.ClientSocketServiceInterface;
 import com.openrobot.common.ControlCommunicationConstants;
@@ -69,7 +70,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 	
 	private ServerSocketService mainServerService;
 	private ServerSocketService controlServerService;
-	private ClientSocketService videoClientService;
+	private ClientSocketByteService videoClientService;
 	
 	private CameraPreviewFeed cameraPreviewFeed;
 	
@@ -134,13 +135,15 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 	
 	private void makeVideoClientServiceConnection() {
 		this.destroyVideoClientServiceConnection();
-		videoClientService = new ClientSocketService(this);
+		videoClientService = new ClientSocketByteService(this);
 		videoClientService.makeConnection(this.getVideoClientIP(), this.getVideoClientPort(), false);
 		
+		/*
 		if (cameraPreviewFeed != null) {
 			cameraPreviewFeed.destroy();
 		}
 		cameraPreviewFeed = new CameraPreviewFeed(this.cameraSurfaceView, this);
+		*/
 	}
 	
 	private void destroyVideoClientServiceConnection() {
@@ -149,10 +152,12 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 			videoClientService = null;
 		}
 		
+		/*
 		if (cameraPreviewFeed != null) {
 			cameraPreviewFeed.destroy();
 			cameraPreviewFeed = null;
 		}
+		*/
 	}
     
     
@@ -291,6 +296,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 			Float yFloat = new Float(thumbBall.getY());
 			
 			String stringToSend = xFloat.toString() + ControlCommunicationConstants.DELIMITER + yFloat.toString();
+			
 			if (!videoClientService.sendStringToServer(stringToSend)) {
 				Log.d("TouchControl", "VideoClientService wasn't able to send String");
 			}
@@ -304,7 +310,12 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     // CameraPreviewFeedInterface
     // *****************************
     public void newImageFromCameraPreviewFeed(CameraPreviewFeed theFeed, byte[] theImage) {
-    	
+    	if (videoClientService != null) {
+    		String imageString = theImage.toString();
+    		Log.d("OUTPUT", "PreStringSize:  " + imageString.length());
+    		videoClientService.setTheBytes(theImage);
+    		videoClientService.sendStringToServer(imageString);   		
+    	}
     }
     
     

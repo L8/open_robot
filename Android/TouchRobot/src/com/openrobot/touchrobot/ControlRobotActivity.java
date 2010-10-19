@@ -1,7 +1,8 @@
 package com.openrobot.touchrobot;
 
 import android.app.Activity;
-import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.openrobot.common.ClientSocketService;
@@ -22,6 +24,7 @@ import com.openrobot.common.EditTextDialogInterface;
 import com.openrobot.common.NetworkHelper;
 import com.openrobot.common.PreferenceHelper;
 import com.openrobot.common.ServerService;
+import com.openrobot.common.ServerSocketByteService;
 import com.openrobot.common.ServerSocketService;
 import com.openrobot.common.ServerSocketServiceInterface;
 import com.openrobot.common.ThumbBall;
@@ -46,6 +49,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	private TextView yPosTextView;
 	private FrameLayout main;
 	private Button killButton;
+	private ImageView videoImageView;
 	
 	private boolean shouldKill = false;
 	private boolean shouldEnable = false;
@@ -53,7 +57,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	
 	private ClientSocketService mainClientService;
 	private ClientSocketService controlClientService;
-	private ServerSocketService videoServerService;
+	private ServerSocketByteService videoServerService;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +97,8 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
             	*/
             }         
         });
+        
+        videoImageView = (ImageView) findViewById(R.id.video_image);
     }
     
 	/*
@@ -124,7 +130,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	
 	private void makeVideoServerServiceConnection() {
 		this.destroyVideoServerServiceConnection();
-		videoServerService = new ServerSocketService(this);
+		videoServerService = new ServerSocketByteService(this);
 		videoServerService.makeConnection(this.getVideoServerPort());
 	}
 	
@@ -306,11 +312,24 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	
 	 @Override
 	public void serverServiceStatusChange(ServerSocketService theService, String message, int status) {
+		 if (videoServerService != null && videoServerService.classBitmap != null) {
+			 videoImageView.setImageBitmap(videoServerService.classBitmap);
+		 }
     	Log.d("OUTPUT", message);
     }
     
     @Override
 	public String serverServiceReceivedMessage(ServerSocketService service, String message) {
+    	
+    	//if (service == videoServerService) {
+    		byte[] bytes = message.getBytes();
+    		Bitmap myBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    		videoImageView.setImageBitmap(myBitmap);
+    		videoImageView.invalidate();
+    	//}
+    	
+    	/*
+    	
     	String[] splitArray = message.split(ControlCommunicationConstants.DELIMITER);
     	
 	    if (service == videoServerService) {    		
@@ -325,6 +344,7 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	        }
 	        
 	    }
+	    */
 	    return null;
     }
 
