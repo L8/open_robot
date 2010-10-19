@@ -289,17 +289,6 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		xPosTextView.setText(Integer.toString(tb.translatedX()));
 		yPosTextView.setText(Integer.toString(-tb.translatedY()));
 		
-
-		if (videoClientService != null && videoClientService.isConnected()) {
-			Float xFloat = new Float(thumbBall.getX());
-			Float yFloat = new Float(thumbBall.getY());
-			
-			String stringToSend = xFloat.toString() + ControlCommunicationConstants.DELIMITER + yFloat.toString();
-			if (!videoClientService.sendStringToServer(stringToSend)) {
-				Log.d("TouchControl", "VideoClientService wasn't able to send String");
-			}
-		}
-		
 		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
 	}
     

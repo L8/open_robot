@@ -311,21 +311,21 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
     
     @Override
 	public String serverServiceReceivedMessage(ServerSocketService service, String message) {
-    	String[] splitArray = message.split(ControlCommunicationConstants.DELIMITER);
+String[] splitArray = message.split(ControlCommunicationConstants.DELIMITER);
     	
-	    if (service == videoServerService) {    		
-	        if (splitArray.length >= 2) {
-	    		
-	    		float x = Float.parseFloat(((String)splitArray[0]));
-	    		float y = Float.parseFloat(((String)splitArray[1]));
-	    		Log.d("OUTPUT", splitArray[0] + ",  " + x + "        " + splitArray[1] + ",  " + y);
-	    		thumbBall.setX(x);
-	    		thumbBall.setY(y);
-	    		thumbBall.invalidate();
-	        }
-	        
-	    }
-	    return null;
+    if (service == videoServerService) {    		
+        if (splitArray.length >= 2) {
+    		
+    		float x = Float.parseFloat(((String)splitArray[0]));
+    		float y = Float.parseFloat(((String)splitArray[1]));
+    		Log.d("OUTPUT", splitArray[0] + ",  " + x + "        " + splitArray[1] + ",  " + y);
+    		thumbBall.setX(x);
+    		thumbBall.setY(y);
+    		thumbBall.invalidate();
+        	}
+        	return null;
+    	}
+    	return null;
     }
 
 	

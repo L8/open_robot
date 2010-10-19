@@ -296,7 +296,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 			
 			String stringToSend = xFloat.toString() + ControlCommunicationConstants.DELIMITER + yFloat.toString();
 			if (!videoClientService.sendStringToServer(stringToSend)) {
-				Log.d("TouchControl", "VideoClientService wasn't able to send String");
+				Log.d("TouchControl", "ControlClientService wasn't able to send String");
 			}
 		}
 		
