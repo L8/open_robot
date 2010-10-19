@@ -138,12 +138,6 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		videoClientService = new ClientSocketByteService(this);
 		videoClientService.makeConnection(this.getVideoClientIP(), this.getVideoClientPort(), false);
 		
-		/*
-		if (cameraPreviewFeed != null) {
-			cameraPreviewFeed.destroy();
-		}
-		cameraPreviewFeed = new CameraPreviewFeed(this.cameraSurfaceView, this);
-		*/
 	}
 	
 	private void destroyVideoClientServiceConnection() {
@@ -151,13 +145,6 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 			videoClientService.disconnect();
 			videoClientService = null;
 		}
-		
-		/*
-		if (cameraPreviewFeed != null) {
-			cameraPreviewFeed.destroy();
-			cameraPreviewFeed = null;
-		}
-		*/
 	}
     
     
@@ -189,6 +176,13 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		this.destroyMainServerServiceConnection();
 		this.destroyControlServerServiceConnection();
 		this.destroyVideoClientServiceConnection();
+		
+		
+		if (cameraPreviewFeed != null) {
+			cameraPreviewFeed.destroy();
+			cameraPreviewFeed = null;
+		}
+		
     	super.onDestroy();
     }
     
@@ -290,18 +284,6 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		xPosTextView.setText(Integer.toString(tb.translatedX()));
 		yPosTextView.setText(Integer.toString(-tb.translatedY()));
 		
-
-		if (videoClientService != null && videoClientService.isConnected()) {
-			Float xFloat = new Float(thumbBall.getX());
-			Float yFloat = new Float(thumbBall.getY());
-			
-			String stringToSend = xFloat.toString() + ControlCommunicationConstants.DELIMITER + yFloat.toString();
-			
-			if (!videoClientService.sendStringToServer(stringToSend)) {
-				Log.d("TouchControl", "VideoClientService wasn't able to send String");
-			}
-		}
-		
 		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
 	}
     
@@ -311,10 +293,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
     // *****************************
     public void newImageFromCameraPreviewFeed(CameraPreviewFeed theFeed, byte[] theImage) {
     	if (videoClientService != null) {
-    		String imageString = theImage.toString();
-    		Log.d("OUTPUT", "PreStringSize:  " + imageString.length());
-    		videoClientService.setTheBytes(theImage);
-    		videoClientService.sendStringToServer(imageString);   		
+    		videoClientService.sendByteArrayToServer(theImage);
     	}
     }
     

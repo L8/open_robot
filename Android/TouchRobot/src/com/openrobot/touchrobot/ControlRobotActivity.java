@@ -2,7 +2,6 @@ package com.openrobot.touchrobot;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,13 +24,12 @@ import com.openrobot.common.NetworkHelper;
 import com.openrobot.common.PreferenceHelper;
 import com.openrobot.common.ServerService;
 import com.openrobot.common.ServerSocketByteService;
-import com.openrobot.common.ServerSocketService;
-import com.openrobot.common.ServerSocketServiceInterface;
+import com.openrobot.common.ServerSocketByteServiceInterface;
 import com.openrobot.common.ThumbBall;
 import com.openrobot.common.ThumbBallListener;
 
 public class ControlRobotActivity extends Activity implements ThumbBallListener, 
-						ClientSocketServiceInterface, ServerSocketServiceInterface, EditTextDialogInterface {
+						ClientSocketServiceInterface, ServerSocketByteServiceInterface, EditTextDialogInterface {
 		
 	private static final int CONTROL_CLIENT_IP_DIALOG_TAG = 2;
 	private static final int CONTROL_CLIENT_PORT_DIALOG_TAG = 3;
@@ -309,44 +307,21 @@ public class ControlRobotActivity extends Activity implements ThumbBallListener,
 	}
 	
 	
+	// ********************************
+	// ServerSocketByteServiceInterface
+    // ********************************
+	@Override
+	public void serverServiceStatusChange(ServerSocketByteService service, String message, int status) {
+		
+	}
 	
-	 @Override
-	public void serverServiceStatusChange(ServerSocketService theService, String message, int status) {
-		 if (videoServerService != null && videoServerService.classBitmap != null) {
-			 videoImageView.setImageBitmap(videoServerService.classBitmap);
-		 }
-    	Log.d("OUTPUT", message);
-    }
-    
-    @Override
-	public String serverServiceReceivedMessage(ServerSocketService service, String message) {
-    	
-    	//if (service == videoServerService) {
-    		byte[] bytes = message.getBytes();
-    		Bitmap myBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-    		videoImageView.setImageBitmap(myBitmap);
-    		videoImageView.invalidate();
-    	//}
-    	
-    	/*
-    	
-    	String[] splitArray = message.split(ControlCommunicationConstants.DELIMITER);
-    	
-	    if (service == videoServerService) {    		
-	        if (splitArray.length >= 2) {
-	    		
-	    		float x = Float.parseFloat(((String)splitArray[0]));
-	    		float y = Float.parseFloat(((String)splitArray[1]));
-	    		Log.d("OUTPUT", splitArray[0] + ",  " + x + "        " + splitArray[1] + ",  " + y);
-	    		thumbBall.setX(x);
-	    		thumbBall.setY(y);
-	    		thumbBall.invalidate();
-	        }
-	        
-	    }
-	    */
-	    return null;
-    }
+	@Override
+	public String serverServiceReceivedBitmap(ServerSocketByteService service, Bitmap theBitmap) {
+		if (theBitmap != null) {
+			videoImageView.setImageBitmap(theBitmap);
+		}
+		return null;
+	}
 
 	
     // ***************************
