@@ -7,14 +7,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.openrobot.common.AmarinoService;
-import com.openrobot.common.ClientService;
+import com.openrobot.common.CameraPreviewFeed;
+import com.openrobot.common.CameraPreviewFeedInterface;
 import com.openrobot.common.ClientSocketService;
 import com.openrobot.common.ClientSocketServiceInterface;
 import com.openrobot.common.ControlCommunicationConstants;
@@ -22,14 +21,14 @@ import com.openrobot.common.DialogHelper;
 import com.openrobot.common.EditTextDialogInterface;
 import com.openrobot.common.NetworkHelper;
 import com.openrobot.common.PreferenceHelper;
-import com.openrobot.common.ServerService;
 import com.openrobot.common.ServerSocketService;
 import com.openrobot.common.ServerSocketServiceInterface;
 import com.openrobot.common.ThumbBall;
 import com.openrobot.common.ThumbBallListener;
 
 public class BeRobotActivity extends Activity implements ThumbBallListener, ServerSocketServiceInterface, 
-						ClientSocketServiceInterface, EditTextDialogInterface {
+						ClientSocketServiceInterface, EditTextDialogInterface,
+						CameraPreviewFeedInterface {
 	
 	private final String DEVICE_ADDRESS = "00:07:80:91:32:51";
 	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
@@ -62,7 +61,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 	private TextView xPosTextView;
 	private TextView yPosTextView;
 	private FrameLayout main;
-	private Button killButton;
+	private SurfaceView cameraSurfaceView;
 	
 	private boolean shouldKill = false;
 	private boolean shouldEnable = false;
@@ -71,6 +70,8 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 	private ServerSocketService mainServerService;
 	private ServerSocketService controlServerService;
 	private ClientSocketService videoClientService;
+	
+	private CameraPreviewFeed cameraPreviewFeed;
 	
 	private long lastChange;
 
@@ -89,7 +90,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
         lastChange = System.currentTimeMillis();
         
         main = (FrameLayout) findViewById(R.id.main_view);
-        main.setBackgroundColor(Color.CYAN);
+        main.setBackgroundColor(Color.TRANSPARENT);  // Was formerly Color.CYAN
         
         xPosTextView = (TextView)findViewById(R.id.x_position_textview);
         yPosTextView = (TextView)findViewById(R.id.y_position_textview);
@@ -101,23 +102,8 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
         thumbBall.setDelegate(this);
         main.addView(thumbBall);
         
-        this.killButton = (Button)this.findViewById(R.id.kill_button);
-        this.killButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	if (killEnabled) {
-            		shouldEnable = true;
-            		shouldKill = false;
-            		killEnabled = false;
-            		killButton.setText("Stop, please");
-            	} else {
-            		shouldEnable = false;
-            		shouldKill = true;
-            		killEnabled = true;
-            		killButton.setText("OK, Game On.");
-            	}
-            }         
-        });
+        this.cameraSurfaceView = (SurfaceView)findViewById(R.id.preview);
+        cameraPreviewFeed = new CameraPreviewFeed(this.cameraSurfaceView, this);
     }
 	
 	private void makeMainServerServiceConnection() {
@@ -150,13 +136,23 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		this.destroyVideoClientServiceConnection();
 		videoClientService = new ClientSocketService(this);
 		videoClientService.makeConnection(this.getVideoClientIP(), this.getVideoClientPort(), false);
+		
+		if (cameraPreviewFeed != null) {
+			cameraPreviewFeed.destroy();
+		}
+		cameraPreviewFeed = new CameraPreviewFeed(this.cameraSurfaceView, this);
 	}
 	
 	private void destroyVideoClientServiceConnection() {
 		if (videoClientService != null) {
 			videoClientService.disconnect();
 			videoClientService = null;
-		}	
+		}
+		
+		if (cameraPreviewFeed != null) {
+			cameraPreviewFeed.destroy();
+			cameraPreviewFeed = null;
+		}
 	}
     
     
@@ -302,6 +298,14 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		
 		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
 	}
+    
+    
+    // *****************************
+    // CameraPreviewFeedInterface
+    // *****************************
+    public void newImageFromCameraPreviewFeed(CameraPreviewFeed theFeed, byte[] theImage) {
+    	
+    }
     
     
     // *****************************

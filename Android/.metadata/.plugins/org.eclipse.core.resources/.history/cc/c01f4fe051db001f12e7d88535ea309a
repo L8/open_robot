@@ -1,0 +1,7 @@
+package com.openrobot.common;
+
+import android.graphics.YuvImage;
+
+public interface CameraPreviewFeedInterface {
+	public void newImageFromCameraPreviewFeed(CameraPreviewFeed theFeed, byte[] theImage);
+}

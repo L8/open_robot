@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;antelope_canyon.jpg&apos; to &apos;drawable-hdpi&apos;&#x0A;- Original project: &apos;WindowBackground&apos;&#x0A;- Destination element: &apos;drawable-hdpi&apos;&#x0A;- Original element: &apos;antelope_canyon.jpg&apos;" description="Copy file" element1="res/drawable/antelope_canyon.jpg" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1287469269634" target="/TouchRobot/res/drawable-hdpi" units="0" version="1.0"/>
+</session>

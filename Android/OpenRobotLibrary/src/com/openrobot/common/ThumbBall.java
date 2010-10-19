@@ -36,7 +36,7 @@ public class ThumbBall extends View implements OnTouchListener {
 	        constructUpdateTimeTask();
 	        this.setOnTouchListener(this);
 	        circlePaint.setColor(0xFF000000);
-	        linePaint.setColor(Color.BLACK);
+	        linePaint.setColor(Color.MAGENTA);
 	        this.x = x;
 	        this.y = y;
 	        this.r = r;

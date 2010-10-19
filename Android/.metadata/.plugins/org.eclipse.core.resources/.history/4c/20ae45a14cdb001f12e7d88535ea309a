@@ -1,0 +1,31 @@
+package com.openrobot.common;
+
+import java.io.ByteArrayOutputStream;
+
+
+import android.graphics.Rect;
+import android.hardware.Camera;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
+public class CameraPreviewFeed {
+	 	private SurfaceHolder mHolder;
+
+	    private SurfaceView mPreview;
+
+	    private Camera mCamera;
+
+	    private boolean mTorchMode;
+
+	    private Rect r;
+
+	    private int previewHeight = 0;
+
+	    private int previewWidth = 0;
+
+	    private int previewFormat = 0;
+
+	    private byte[] mCallbackBuffer;
+
+	    private ByteArrayOutputStream out;
+}
