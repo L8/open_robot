@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sensor Demo</string>
+	<string name="add_values">Add values to the chart</string>    
+	<string name="x">X</string>    
+	<string name="y">Y</string>
+	<string name="add">Add</string>
+	<string name="new_series">New series</string>
+    <string name="main_screen">MainScreen</string>
+    <string name="splash_screen">SplashScreen</string>
+</resources>

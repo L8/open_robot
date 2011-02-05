@@ -31,10 +31,10 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 						ClientSocketServiceInterface, EditTextDialogInterface,
 						CameraPreviewFeedInterface {
 	
-	private final String DEVICE_ADDRESS = "00:07:80:91:32:51";
+	private final String DEVICE_ADDRESS = "00:19:5D:EE:25:1C";
 	private static final char ARDUINO_CONTROL_INPUT_FUNCTION_FLAG = 'c';
 	private static final char ARDUINO_SHOULD_KILL_FUNCTION_FLAG = 'd';
-	private final boolean BLUETOOTH_ENABLED = false; 
+	private final boolean BLUETOOTH_ENABLED = true; 
 	
 	private static final String ARDUINO_MAC_ADDRESS_KEY = "ARDUINO_MAC_ADDRESS";
 	private static final String VIDEO_CLIENT_PORT_KEY = "VIDEO_CLIENT_PORT";
@@ -46,7 +46,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 	private static final int VIDEO_CLIENT_IP_DIALOG_TAG = 3;
 	private static final int CONTROL_SERVER_PORT_DIALOG_TAG = 4;
 	
-	private static final String DEFAULT_ARDUINO_MAC_ADDRESS = "00:07:80:91:32:51";
+	private static final String DEFAULT_ARDUINO_MAC_ADDRESS = "00:19:5D:EE:25:1C";
 	public static final String DEFAULT_SERVER_IP_ADDRESS = "192.168.0.164";
 	
 	private static final int DEFAULT_SERVER_PORT_ADDRESS = 8080;
@@ -85,6 +85,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
         setContentView(R.layout.be_robot_main);
 	          
         if (BLUETOOTH_ENABLED) {
+        	Log.d("DEVICE ADDRESS", DEVICE_ADDRESS);
         	amarinoService = new AmarinoService(this, DEVICE_ADDRESS);
         }
         
@@ -291,6 +292,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 		yPosTextView.setText(Integer.toString(-tb.translatedY()));
 		
 
+		/*
 		if (videoClientService != null && videoClientService.isConnected()) {
 			Float xFloat = new Float(thumbBall.getX());
 			Float yFloat = new Float(thumbBall.getY());
@@ -301,8 +303,9 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 				Log.d("TouchControl", "VideoClientService wasn't able to send String");
 			}
 		}
-		
+		*/
 		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
+		
 	}
     
     
@@ -357,7 +360,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
         		thumbBall.setX(x);
         		thumbBall.setY(y);
         		thumbBall.invalidate();
-        		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getY());
+        		this.messageArduinoIfAppropriate((int)thumbBall.getX(), (int)thumbBall.getScaledY(0.3f));
         	}
         	return null;
     	}
@@ -398,6 +401,7 @@ public class BeRobotActivity extends Activity implements ThumbBallListener, Serv
 			int[] values = new int[2];
 			values[0] = x;   
 			values[1] = y;
+			Log.d("OUTPUT", "X: " + x + ", " + "Y:" + y);
 			
 			if (BLUETOOTH_ENABLED) {
 				if (amarinoService != null) {

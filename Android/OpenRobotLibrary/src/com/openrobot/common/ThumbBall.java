@@ -35,7 +35,7 @@ public class ThumbBall extends View implements OnTouchListener {
 	        super(context);
 	        constructUpdateTimeTask();
 	        this.setOnTouchListener(this);
-	        circlePaint.setColor(0xFF000000);
+	        circlePaint.setColor(Color.CYAN);
 	        linePaint.setColor(Color.MAGENTA);
 	        this.x = x;
 	        this.y = y;
@@ -129,6 +129,10 @@ public class ThumbBall extends View implements OnTouchListener {
 
 	public void setDelegate(ThumbBallListener delegate) {
 		this.delegate = delegate;
+	}
+	
+	public float getScaledY(float scale) {
+		return y * scale;
 	}
 
 	public float getX() {
