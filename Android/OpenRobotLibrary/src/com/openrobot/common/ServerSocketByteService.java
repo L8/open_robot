@@ -1,10 +1,6 @@
 package com.openrobot.common;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
@@ -34,12 +30,10 @@ public class ServerSocketByteService {
     private Handler handler = new Handler();
     private ServerSocket serverSocket;
     private OutputStreamWriter out;
-    
-    public Bitmap classBitmap;
 
-    private ServerSocketServiceInterface delegate;
+    private ServerSocketByteServiceInterface delegate;
 	
-    public ServerSocketByteService(ServerSocketServiceInterface delegate) {
+    public ServerSocketByteService(ServerSocketByteServiceInterface delegate) {
     	super();
     	this.delegate = delegate;
 		SERVERIP = NetworkHelper.getLocalIpAddress();	
@@ -67,13 +61,13 @@ public class ServerSocketByteService {
 		fst.start();
 	}
 	
-	private void handleInput(final String input) {
+	private void handleInput(final Bitmap inputBitmap) {
        
 	    handler.post(new Runnable() {
 	            
 	    	public void run() {
 	    		if (delegate != null) {
-	    			String response = delegate.serverServiceReceivedMessage(null, input);
+	    			String response = delegate.serverServiceReceivedBitmap(getThis(), inputBitmap );
 	    			if (response != null) {
 	    				try {
 		    				out.write(response);
@@ -98,11 +92,11 @@ public class ServerSocketByteService {
     	});
     }
     
-    public ServerSocketServiceInterface getDelegate() {
+    public ServerSocketByteServiceInterface getDelegate() {
 		return delegate;
 	}
 
-	public void setDelegate(ServerSocketServiceInterface delegate) {
+	public void setDelegate(ServerSocketByteServiceInterface delegate) {
 		this.delegate = delegate;
 	}
 	
@@ -131,36 +125,11 @@ public class ServerSocketByteService {
                         	while (true) {
 	                        	if ( (bitmap = BitmapFactory.decodeStream(client.getInputStream())) != null) {
 	                        		if (bitmap != null) {
-	                            		Log.d("OUTPUT", "bitmap was not null");
-	                            		classBitmap = bitmap;
-	                            		 handler.post(new Runnable() {
-	                         	            
-	                            		    	public void run() {
-	                            		delegate.serverServiceStatusChange(null, "dsd", 3);
-	                            		    	}
-	                            		 });
+	                        			Log.d("OUTPUT", "bitmap was not null");
+	                        			handleInput(bitmap);
 	                            	}
 	                        	}
                         	}
-                        	
-                        	
-                        	
-                        	
-                        	/*
-
-                            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                            OutputStream sock_out= client.getOutputStream();
-                            OutputStream bout= new BufferedOutputStream(sock_out);
-                            out = new OutputStreamWriter(bout, "8859_1");
-                            
-                            String line = null;
-                            while ((line = in.readLine()) != null) {
-                                Log.d("ServerResponse:  ", line);
-                                handleInput(line);                        
-                            }
-                            
-                            break;
-                            */
                         } catch (UnsupportedEncodingException e) {
                         	postStatus("This VM does not support the Latin-1 character set.", SERVER_SERVICE_STATUS_CHARACTER_EXCEPTION);
                         	Log.d("StreamError:  ", "This VM does not support the Latin-1 character set.");
