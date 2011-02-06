@@ -1,0 +1,14 @@
+/* style.css */
+
+
+table {
+   text-align:center;
+}
+
+#image_canvas {
+   background-color: #eeeeee;
+}
+
+#control_div {
+   display: none;
+}

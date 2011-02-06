@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Remote Console</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link type="text/css" rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="prototype.js"></script>
+    
+    <!-- SWFObject and FABridge and only needed for the Flash WebSocket
+         fallback. If the current browser supports WebSockets natively these
+         are not needed. -->
+    <script type="text/javascript" src="swfobject.js"></script>
+    <script type="text/javascript" src="FABridge.js"></script>
+    <script type="text/javascript" src="canvas_helper.js"></script>
+
+    <script type="text/javascript">
+    
+    var INSTRUCTION_KEY = "INSTRUCTION";
+ 	 var SUBSCRIPTION_KEY = "SUBSCRIPTION_KEY";
+ 	 var SUBSCRIPTION_VALUE_CONTROL = 0x1;
+    
+        document.observe("dom:loaded", function() {
+            function log(text) {
+                $("log").innerHTML = (new Date).getTime() + ": " + (!Object.isUndefined(text) && text !== null ? text.escapeHTML() : "null") + $("log").innerHTML;
+            }
+
+            if (!window.WebSocket) {
+                log("WebSocket not natively supported, falling back to Flash");
+                                
+                WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
+                WEB_SOCKET_DEBUG = true;
+
+                $$("head")[0].insert(new Element("script", {
+                  "type": "text/javascript",
+                  "src": "web_socket.js"
+                }));
+
+            } else {
+                log("Using browser's native WebSocket implementation")
+            }
+
+
+            var controlWS;
+            var videoWS;
+        
+            
+            
+            // Control Sensor Form
+            $("control_sensor_form").observe("submit", function(e) {
+                e.stop();
+                controlWS = new WebSocket($F("control_sensor_uri"));
+                controlWS.onopen = function() {
+                    log("[WebSocket#onopen]\n");
+                    var controlDiv = document.getElementById("control_div");
+                    controlDiv.style.display = 'block';
+                    var canvas = document.getElementById('wads_canvas');
+                    drawWADS(-1, canvas);
+                }
+                controlWS.onmessage = function(e) {
+                   
+                    //log("[WebSocket#onmessage] Message: '" + e.data + "'\n");
+                }
+                controlWS.onclose = function() {
+                    log("[WebSocket#onclose]\n");
+                    $("control_sensor_uri", "control_sensor_connect").invoke("enable");
+                    $("control_sensor_disconnect").disable();
+                    controlWS = null;
+                    var controlDiv = document.getElementById("control_div");
+                    controlDiv.style.display = 'none';
+                }
+                $("control_sensor_uri", "control_sensor_connect").invoke("disable");
+                $("control_sensor_disconnect").enable();
+            });
+
+            $("control_sensor_disconnect").observe("click", function(e) {
+                e.stop();
+                if (controlWS) {
+                    controlWS.close();
+                }
+            });
+            
+            
+            // Video Form
+            $("video_form").observe("submit", function(e) {
+                e.stop();
+                videoWS = new WebSocket($F("video_uri"));
+                videoWS.onopen = function() {
+                    log("[WebSocket#onopen]\n");
+                }
+                videoWS.onmessage = function(e) {
+                   var ctx = document.getElementById('image_canvas').getContext('2d');
+                   var img = new Image();
+                   img.onload = function(){
+                     ctx.drawImage(img,0,0);
+                   }
+                   img.src = 'data:image/jpeg;base64,' + e.data;
+                   
+                    //log("[WebSocket#onmessage] Message: '" + e.data + "'\n");
+                }
+                videoWS.onclose = function() {
+                    log("[WebSocket#onclose]\n");
+                    $("video_uri", "video_connect").invoke("enable");
+                    $("video_disconnect").disable();
+                    videoWS = null;
+                }
+                $("video_uri", "video_connect").invoke("disable");
+                $("video_disconnect").enable();
+            });
+
+            $("video_disconnect").observe("click", function(e) {
+                e.stop();
+                if (videoWS) {
+                    videoWS.close();
+                }
+            });
+            
+            // Send Form
+           $("sendForm").observe("submit", function(e) {
+                e.stop();
+                if (controlWS) {
+                    var textField = $("textField");
+                    controlWS.send(textField.value);
+                    log("[WebSocket#send]      Send:    '" + textField.value + "'\n");
+                    textField.value = "";
+                    textField.focus();
+                }
+            });
+            
+            $("request_control").observe("click", function(e) {
+               e.stop();
+
+               var jsonRequest = {SUBSCRIPTION_KEY : SUBSCRIPTION_VALUE_CONTROL};
+               var jsonString = Object.toJSON(jsonRequest);
+                if (controlWS) {
+                    log("Making control request:  " + jsonString + "\n");
+                    controlWS.send(jsonString);
+                }
+            });
+            
+            $("release_control").observe("click", function(e) {
+               e.stop();
+               log("Control released");
+            });
+            
+              document.onkeypress = keyPress;       
+              document.onkeyup = keyUp;
+              
+              function keyUp(e) {
+                 var canvas = document.getElementById('wads_canvas');
+                 drawWADS(-1, canvas);
+              }
+
+              function keyPress(e) {
+                 
+                 var KeyID = (window.event) ? event.keyCode : e.keyCode;
+                 var canvas = document.getElementById('wads_canvas');
+                 
+                 switch(KeyID) {
+                    
+                    case 16:
+                    log("Shift\n");
+                    break; 
+
+                    case 17:
+                    log("Ctrl\n");
+                    break;
+
+                    case 18:
+                    log("Alt\n");
+                    break;
+
+                    case 19:
+                    log("Pause\n");
+                    break;
+
+                    case 37:
+                    log("Arrow Left\n");
+                    break;
+
+                    case 38:
+                    log("Arrow Up\n");
+                    break;
+
+                    case 39:
+                    log("Arrow Right\n");
+                    break;
+
+                    case 40:
+                    log("Arrow Down\n");
+                    break;
+                    
+                    case 97:
+                    log("a \n");
+                    drawWADS(97, canvas);
+                    break;
+                    
+                    case 100:
+                    log("d \n");
+                    drawWADS(100, canvas);
+                    break;
+
+                    case 115:
+                    log("s \n");
+                    drawWADS(115, canvas);
+                    break;
+
+                    case 119:
+                    log("w \n");
+                    drawWADS(119, canvas);
+                    break;
+                    
+                    
+                 }
+              }
+              
+        });
+        
+    </script>
+  </head>
+  <body>
+      <br>
+      <br>
+      <table>
+         <tr>
+            <td>
+               <form id="control_sensor_form">
+                  <input type="text" id="control_sensor_uri" value="ws://192.168.0.180:8887" style="width:200px;"> 
+                  <input type="submit" id="control_sensor_connect" value="Connect">
+                  <input type="button" id="control_sensor_disconnect" value="Disconnect" disabled="disabled">
+               </form>
+            </td>
+            <td>
+               <form id="video_form">
+                  <input type="text" id="video_uri" value="ws://192.168.0.180:8886" style="width:200px;"> 
+                  <input type="submit" id="video_connect" value="Connect">
+                  <input type="button" id="video_disconnect" value="Disconnect" disabled="disabled">
+               </form>
+            </td>
+         </tr>
+         <tr>
+            <td>
+               <form><textarea id="log" rows="29" cols="80" style="font-family:monospace; color:red;"></textarea></form><br>
+            </td>
+            <td width="550" height="400">
+               <canvas id="image_canvas" width="550" height="400"></canvas>
+            </td>
+         <tr>
+            <td>
+               <div id="control_div">
+                 <canvas id="wads_canvas" width="100" height="100"></canvas>
+                  <form id="controlForm">
+                     <input type="button" id="request_control" value="Request Control">
+                     <input type="button" id="release_control" value="Release Control">
+                  </form><br>
+               </div>
+            </td>
+            <td> 
+               <form id="sendForm"><input type="text" id="textField" value="" style="width:200px;"> <input type="submit" value="Send">
+               </form>
+               </td>
+            <td> 
+             
+            </td>
+            <td>
+            </td>
+         </tr>
+         
+      </table>
+  </body>
+</html>
